@@ -42,7 +42,7 @@ class GUI_ShareFiles( GuiModule ):
         self.settings.allowConnection = self.allowCon.get()
 
     def onStart( self ):
-        self.header = Label( self, text=f"Start Text {self.context.numShareableFiles}")
+        self.header = Label( self, text=f"Aantal bestanden gevonden: {self.context.numShareableFiles}")
         self.header.pack()
                     
         LAN_devices = []
