@@ -7,10 +7,13 @@ from tkinter import *
 class GUI_ShareFiles( GuiModule ):
 
     def send_files( self, server ):
-        print( server )
-        self.context.tcp.client_send_file(
-            server, "text.txt", "my content to send"
-        )
+        files = self.context.getShareableFiles()
+        
+        print(f"Attempt to share files to: {server}")
+        print(files)
+
+        for file in files:
+            self.context.tcp.client_send_file( server, file['filename'], file['content'] )
 
     def drawDevice( self, device, i ):
        

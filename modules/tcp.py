@@ -12,7 +12,7 @@ class TCP:
     # server
     def start_server( self ) -> None:
         s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
-        host = '127.0.0.1'
+        host = self.settings.server_ip
         port = self.settings.tcp_port
 
         print( f"Start server on: {host}:{port} ")
@@ -32,7 +32,7 @@ class TCP:
             if rcv_data['action']:
                 # request to store a file
                 if rcv_data['action'] == "store_file":
-                    print( f"store file: {rcv_data['file']}" )
+                    print( f"received file: {rcv_data['file']}" )
 
                 # request to return a value
                 if rcv_data['action'] == "get_allow_receive":

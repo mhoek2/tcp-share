@@ -60,6 +60,21 @@ class Application( Tk ):
         self.numShareableFiles = num_files
         return True if num_files > 0 else False
 
+    def getShareableFiles( self ) -> None:
+        """Return list of files"""
+        files = []
+
+        if self.hasShareableFiles():
+            for i, filename in enumerate (os.listdir( self.settings.filesdir ) ):
+                file_path = os.path.join( self.settings.filesdir, filename )
+
+                if os.path.isfile( file_path ):
+                    # need to read the content of the file ..
+                    # use hardcoded test data for now
+                    files.append( { "filename": filename, "content": "hard-coded content from def app.getShareableFiles()" } )
+
+        return files
+
     def removeShareableFiles( self ):
         """Remove local shareable files"""
         print("Remove local shareable files")
