@@ -4,7 +4,9 @@ class Settings:
     def __init__( self ) -> None:
         """Global applictaion settings"""
         self.application_title = "TCP Share"
-        self.application_size = "400x500"
+        self.appplication_width = 400       # winfo_width & winfo_height doesnt work?
+        self.appplication_height = 500
+        self.application_size = f"{self.appplication_width}x{self.appplication_height}"
 
         self.rootdir = Path.cwd()
         self.filesdir = f"{self.rootdir}\\files\\"
@@ -13,3 +15,6 @@ class Settings:
         self.num_files = 3
         self.num_salts = 50;
         self.num_final_salts = self.num_files;
+
+        # tcp
+        self.tcp_port = 43431

@@ -37,6 +37,11 @@ class Gui( tk.Tk ):
 
         self.decide_main_frame()
 
+    def create_frame( self, module, i ):
+        frame = module( self, self.context )
+        frame.grid(row = 0, column = 0, sticky ="nsew")
+        self.frames[i] = frame
+
     def load_frames( self ) -> None:
         """Register the GUI frames and define a name macro for each"""
 
@@ -49,9 +54,7 @@ class Gui( tk.Tk ):
         #   and import the class at the start of this file
         for i, module in enumerate((GUI_ShareFiles, 
                                     GUI_CreateFiles )):
-            frame = module( self, self.context )
-            frame.grid(row = 0, column = 0, sticky ="nsew")
-            self.frames[i] = frame
+            self.create_frame( module, i)
 
     def show_frame( self, index ):
         """Hide other frames and show the frame by the index"""
