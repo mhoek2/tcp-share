@@ -29,17 +29,24 @@ class TCP:
 
             rcv_data = json.loads( received )
 
-            if rcv_data['action']:
+            send_data = { }
+
+            if 'action' in rcv_data:
                 # request to store a file
                 if rcv_data['action'] == "store_file":
-                    print( f"received file: {rcv_data['file']}" )
+                    if self.settings.allowConnection:
+                        print( f"received file: {rcv_data['file']}" )
+                        send_data = { 'success': 'File received successfully!' }
+                    else:
+                        print("Connections is refused!")
+                        send_data = { 'error': 'I do not allow connections!!' }
 
                 # request to return a value
                 if rcv_data['action'] == "get_allow_receive":
                     print( f"request get_allow_receive" )
                     send_data = { 'value': False }
-                    c.send( json.dumps( send_data ).encode() )
-
+                    
+            c.send( json.dumps( send_data ).encode() )
             c.close()   
         return
 
@@ -68,6 +75,15 @@ class TCP:
             }
 
         s.sendall( bytes( json.dumps( send_data ) + "\n", "utf-8" ) ) # Send data
+        
+        rcv_data = json.loads( str( s.recv(1024), "utf-8" ) )
+        
+        if 'success' in rcv_data:
+            print( rcv_data['success'] )
+
+        if 'error' in rcv_data:
+            print( rcv_data['error'] )
+
         self.client_disconnect( s )
 
     def get_boolean( self, server, parameter ):

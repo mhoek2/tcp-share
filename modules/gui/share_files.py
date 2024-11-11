@@ -38,12 +38,14 @@ class GUI_ShareFiles( GuiModule ):
 
         self.current_position.y += 55
 
+    def allowConnectionCheckboxCallback( self ):
+        self.settings.allowConnection = self.allowCon.get()
+
     def onStart( self ):
         self.header = Label( self, text=f"Start Text {self.context.numShareableFiles}")
         self.header.pack()
-                                               
+                    
         LAN_devices = []
-        LAN_devices.append( ("LOCAL", "127.0.0.1" ) )
         LAN_devices.append( ("RGD-ITA-001", "10.0.40.126" ) )
         LAN_devices.append( ("RGD-ITA-005", "10.0.1.63" ) )
         LAN_devices.append( ("RGD-ITA-002", "10.0.1.52" ) )
@@ -54,9 +56,17 @@ class GUI_ShareFiles( GuiModule ):
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
 
+        self.allowCon = IntVar( value=self.settings.allowConnection )
+        c1 = Checkbutton( self, text='Verbindingen Toestaan',variable=self.allowCon, onvalue=1, offvalue=0, 
+                        command=lambda : self.allowConnectionCheckboxCallback() )
+        c1.place( x = 15, y =  self.current_position.y )
+
+        self.current_position.y += 40
+
         for i, device in enumerate( LAN_devices ):
             i = self.drawDevice( device, i )
 
-        button = Button( self, text = "RESET", 
+        button = Button( self, text = "Opnieuw Beginnen", 
                command = lambda : self.context.removeShareableFiles() )
-        button.pack()
+        button.place( x = self.settings.appplication_width - 130, 
+                      y = self.settings.appplication_height - 40 )

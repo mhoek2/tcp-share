@@ -1,4 +1,5 @@
 from pathlib import Path
+from tkinter import IntVar
 
 class Settings:
     def __init__( self ) -> None:
@@ -18,4 +19,6 @@ class Settings:
 
         # tcp
         self.server_ip = '10.0.1.63'
+        #self.server_ip = '10.0.151.181'
         self.tcp_port = 43431
+        self.allowConnection = 1
