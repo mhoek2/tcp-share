@@ -101,11 +101,11 @@ class Application( Tk ):
     # - Continuesly scan 'files' folder  for changes
     # - Run GUI updates
     def bg_worker( self ) -> None:
-        self.bg_worker = threading.Thread( target=self.bg_worker_do, daemon=True )
-        self.bg_worker.start()
-
         self.bg_worker_tick = 0
         self.bg_worker_force_gui = False
+
+        self.bg_worker = threading.Thread( target=self.bg_worker_do, daemon=True )
+        self.bg_worker.start()
 
     def bg_worker_force_gui_update( self ):
         """"Force a pass in the background worker to enter the GUI pass"""
