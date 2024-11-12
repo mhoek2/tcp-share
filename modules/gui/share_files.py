@@ -3,6 +3,7 @@ from modules.app.helper import Vector2
 from modules.gui.gui_module import GuiModule
 
 from tkinter import *
+from tkinter.font import BOLD
 
 class GUI_ShareFiles( GuiModule ):
 
@@ -15,8 +16,7 @@ class GUI_ShareFiles( GuiModule ):
         for file in files:
             self.context.tcp.client_send_file( server, file['filename'], file['content'] )
 
-    def drawDevice( self, device, i ):
-       
+    def drawDevice( self, device, i ):    
         self.device_frame[i] = Frame( self, bg="white", padx=10, pady=10 )
         self.device_frame[i].place( x = 20, 
                             y = self.current_position.y,
@@ -42,8 +42,12 @@ class GUI_ShareFiles( GuiModule ):
         self.settings.allowConnection = self.allowCon.get()
 
     def onStart( self ):
-        self.header = Label( self, text=f"Aantal bestanden gevonden: {self.context.numShareableFiles}")
-        self.header.pack()
+        lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
+        lan_info.configure(font=("Helvetica", 14, "bold"))
+        lan_info.pack()
+
+        header = Label( self, text=f"Aantal bestanden gevonden: {self.context.numShareableFiles}")
+        header.pack()
                     
         LAN_devices = []
         LAN_devices.append( ("RGD-ITA-001", "10.0.40.126" ) )

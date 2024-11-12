@@ -20,15 +20,16 @@ class Application( Tk ):
         self.prevShareableFiles = 0
 
         self.settings : Settings = Settings()
+        self.tcp : TCP = TCP( self ) 
+
         self.tk_root : Gui = Gui( self )
         
 
         # empty placeholder modules
         self.crypt : Crypt = Crypt( self )
-        self.to_pdf : Crypt = ToPDF( self )
+        self.to_pdf : ToPDF = ToPDF( self )
 
         # background worker to check incoming TCP connections
-        self.tcp : TCP = TCP( self )
         self.tcp_worker()
 
         # background worker for appliction

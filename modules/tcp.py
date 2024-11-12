@@ -9,15 +9,25 @@ class TCP:
         self.context = context;
         self.settings : Settings = context.settings
 
+        # Get the LAN IP address of the device
+        self.set_local_ip()
+
+    def set_local_ip( self ):
+        try:
+            # Create a temporary socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # Connect to an external address (this won't actually send packets)
+            s.connect(('8.8.8.8', 80))  # Using Google DNS as an external address
+            self.settings.server_ip = s.getsockname()[0]  # Get the local IP address
+        finally:
+            s.close()
+
     # server
     def start_server( self ) -> None:
         s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
-        host = self.settings.server_ip
-        port = self.settings.tcp_port
+        print( f"Start server on: {self.settings.server_ip}:{self.settings.tcp_port} ")
 
-        print( f"Start server on: {host}:{port} ")
-
-        s.bind( (host, port) )
+        s.bind( (self.settings.server_ip, self.settings.tcp_port) )
         s.listen(5)
 
         while True:

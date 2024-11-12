@@ -18,7 +18,6 @@ class Settings:
         self.num_final_salts = self.num_files;
 
         # tcp
-        self.server_ip = '10.0.1.63'
-        #self.server_ip = '10.0.151.181'
+        self.server_ip = '127.0.0.1'
         self.tcp_port = 43431
         self.allowConnection = 1
