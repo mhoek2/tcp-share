@@ -3,6 +3,8 @@ from modules.app.settings import Settings
 
 import socket
 import json
+import subprocess
+import platform
 
 class TCP:
     def __init__( self, context ) -> None:
@@ -54,19 +56,24 @@ class TCP:
                 # request to return a value
                 if rcv_data['action'] == "get_allow_receive":
                     print( f"request get_allow_receive" )
-                    send_data = { 'value': False }
+                    send_data = { 'value': self.settings.allowConnection }
                     
             c.send( json.dumps( send_data ).encode() )
             c.close()   
         return
 
     # client
-    def client_connect( self, server ) -> None:
+    def client_connect( self, server, timeout=10 ) -> None:
         s = socket.socket()
-        s.connect( ( server[0], server[1] ) )
+        s.settimeout(timeout)
 
-        received = str( s.recv(1024), "utf-8" ) 
-        print(received)
+        try:
+            s.connect( ( server[0], server[1] ) )
+
+            received = str( s.recv(1024), "utf-8" ) 
+            print(received)
+        except socket.timeout:
+            return False
 
         return s
 
@@ -97,24 +104,58 @@ class TCP:
         self.client_disconnect( s )
 
     def get_boolean( self, server, parameter ):
-       s = self.client_connect( server )
+       s = self.client_connect( server, 0.5 )
+
+       if s == False:
+            return False 
 
        s.sendall( bytes( json.dumps( { 'action' : parameter } ) + "\n", "utf-8" ) ) # Send data
        
        received = json.loads( str( s.recv(1024), "utf-8" ) )
 
        self.client_disconnect( s )
-       return bool( received['value'] )
+
+       return bool( received['value'] ) if 'value' in received else False
 
     def get_allow_receive( self, server ):
         state = self.get_boolean( server, "get_allow_receive" )
 
         if state:
-            print("YES")
+            print("Allows receiving")
         else:
-            print("NO")
+            print("Refuse receiving")
 
-        return
+        return state
 
-    def update( self ):
-        print("-")
+    # ping device
+    def ping_device(self, host, network_timeout=1):
+        """Send a ping packet to the specified host, using the system "ping" command."""
+        args = [
+            'ping'
+        ]
+
+        platform_os = platform.system().lower()
+
+        if platform_os == 'windows':
+            args.extend(['-n', '1'])
+            args.extend(['-w', str(network_timeout * 1000)])
+        elif platform_os in ('linux', 'darwin'):
+            args.extend(['-c', '1'])
+            args.extend(['-W', str(network_timeout)])
+        else:
+            raise NotImplemented('Unsupported OS: {}'.format(platform_os))
+
+        args.append(host)
+
+        try:
+            if platform_os == 'windows':
+                output = subprocess.run(args, check=True, universal_newlines=True, stdout=subprocess.PIPE ).stdout
+
+                if output and 'TTL' not in output:
+                    return False
+            else:
+                subprocess.run(args, check=True)
+
+            return True
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            return False

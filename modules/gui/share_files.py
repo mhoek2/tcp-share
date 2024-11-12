@@ -1,3 +1,4 @@
+from cgitb import text
 from modules.app.helper import Vector2
 
 from modules.gui.gui_module import GuiModule
@@ -16,25 +17,50 @@ class GUI_ShareFiles( GuiModule ):
         for file in files:
             self.context.tcp.client_send_file( server, file['filename'], file['content'] )
 
-    def drawDevice( self, device, i ):    
-        self.device_frame[i] = Frame( self, bg="white", padx=10, pady=10 )
-        self.device_frame[i].place( x = 20, 
+    def updateDevice( self, device ):
+        is_online = True if self.context.tcp.ping_device( device['ip'] ) else False
+        is_allowing = False
+
+        if is_online:
+            is_allowing = self.context.tcp.get_allow_receive( (device['ip'], self.settings.tcp_port) ) 
+
+            if is_allowing:
+                device['gui']['status'].config( text="Ready")
+                device['gui']['status_indicator'].config( bg="#00ff00" )
+            else:
+                device['gui']['status'].config( text="Refusing")
+                device['gui']['status_indicator'].config( bg="#fc8c03" )
+        else:
+            device['gui']['status'].config( text="Offline")
+            device['gui']['status_indicator'].config( bg="#ff0000" )
+
+        print( f"Device {device['fqdn']} on IP {device['ip']} online: {is_online} allowing: {is_allowing}" )
+
+    def updateDevices( self ):
+        for device in self.LAN_devices:
+            self.updateDevice( device )
+
+    def drawDevice( self, device ):   
+        device['gui']['frame'] = Frame( self, bg="white", padx=0, pady=0 )
+        device['gui']['frame'].place( x = 20, 
                             y = self.current_position.y,
                             width = (self.settings.appplication_width - 40 ), 
                             height = 45 ) 
-        frame = self.device_frame[i]
+        frame = device['gui']['frame']
 
-        self.buttons[i] = Button( frame, text = device[0], 
-                command = lambda param=( device[1], self.settings.tcp_port ): self.send_files(param) )
-        self.buttons[i].place( y = 0 )
+        device['gui']['status_indicator'] = Frame( frame, bg="#d1d1d1", padx=0, pady=0 )
+        device['gui']['status_indicator'].place( x=-0, y=-0, width=3, heigh =45 ) 
 
-        i += 1
+        pos_x = 10
+        j = 0;
+        device['gui']['send'] = Button( frame, text = device['fqdn'], 
+                command = lambda param=( device['ip'], self.settings.tcp_port ): self.send_files(param) )
+        device['gui']['send'].place( y=10, x=pos_x )
 
-        pos_x = self.current_position.x + 100
-        self.buttons[i] = Button( frame, text = "Get allow connection", 
-                command = lambda param=( device[1], self.settings.tcp_port ): self.context.tcp.get_allow_receive( param ) )
-        self.buttons[i].place( x = pos_x,
-                               y =0 )
+        j += 1
+
+        device['gui']['status'] = Label( frame, text=f"-")
+        device['gui']['status'].place( x = 300, y = 10 ) 
 
         self.current_position.y += 55
 
@@ -49,14 +75,12 @@ class GUI_ShareFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.numShareableFiles}")
         header.pack()
                     
-        LAN_devices = []
-        LAN_devices.append( ("RGD-ITA-001", "10.0.40.126" ) )
-        LAN_devices.append( ("RGD-ITA-005", "10.0.1.63" ) )
-        LAN_devices.append( ("RGD-ITA-002", "10.0.1.52" ) )
-        LAN_devices.append( ("RGD-ITA-006", "10.0.151.181" ) )
+        self.LAN_devices = []
+        self.LAN_devices.append( { 'fqdn':'RGD-ITA-001', 'ip':'10.0.40.126', 'gui': {} } )
+        self.LAN_devices.append( { 'fqdn':'RGD-ITA-005', 'ip':'10.0.1.63', 'gui': {} } )
+        self.LAN_devices.append( { 'fqdn':'RGD-ITA-002', 'ip':'10.0.1.52', 'gui': {} } )
+        self.LAN_devices.append( { 'fqdn':'RGD-ITA-006', 'ip':'10.0.151.181', 'gui': {} } )
 
-        # do it like this for now
-        self.buttons = {}
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
 
@@ -65,12 +89,23 @@ class GUI_ShareFiles( GuiModule ):
                         command=lambda : self.allowConnectionCheckboxCallback() )
         c1.place( x = 15, y =  self.current_position.y )
 
+        self.current_position.y += 25
+
+        # force LAN device status refresh
+        refresh = Button( self, text = "Refresh", 
+               command = lambda : self.context.bg_worker_force_gui_update() )
+        refresh.place( x = 30, y = self.current_position.y )
+
         self.current_position.y += 40
 
-        for i, device in enumerate( LAN_devices ):
-            i = self.drawDevice( device, i )
+        for device in self.LAN_devices:
+            self.drawDevice( device )
+
+        # force a gui pass in bg_worker to ping LAN devices
+        self.context.bg_worker_force_gui_update()
 
         button = Button( self, text = "Opnieuw Beginnen", 
                command = lambda : self.context.removeShareableFiles() )
         button.place( x = self.settings.appplication_width - 130, 
                       y = self.settings.appplication_height - 40 )
+

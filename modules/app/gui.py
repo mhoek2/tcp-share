@@ -56,6 +56,9 @@ class Gui( tk.Tk ):
                                     GUI_CreateFiles )):
             self.create_frame( module, i)
 
+    def is_frame_active( self, index ):
+        return True if index == self.current_frame else False   
+
     def show_frame( self, index ):
         """Hide other frames and show the frame by the index"""
         frame = self.frames[index]

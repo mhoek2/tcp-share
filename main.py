@@ -1,3 +1,4 @@
+from cgi import print_exception
 from tkinter import *
 import threading
 import time
@@ -33,7 +34,7 @@ class Application( Tk ):
         self.tcp_worker()
 
         # background worker for appliction
-        self.background_worker()
+        self.bg_worker()
 
         self.tk_root.mainloop()
 
@@ -87,17 +88,34 @@ class Application( Tk ):
                     os.unlink( file_path )
         return
 
-    # Keep this in main for readability (flow-chart)
+    #
+    # Keep the following in main for readability (flow-chart)
+    #
+
+    # TCP thread: The socket server to allow incoming connections:
     def tcp_worker( self ) -> None:
         self.tcp_server = threading.Thread( target=self.tcp.start_server, daemon=True )
         self.tcp_server.start()
-       
-    def background_worker( self ) -> None:
-        self.bg_worker = threading.Thread( target=self.background_worker_do, daemon=True )
+      
+    # Background thread: 
+    # - Continuesly scan 'files' folder  for changes
+    # - Run GUI updates
+    def bg_worker( self ) -> None:
+        self.bg_worker = threading.Thread( target=self.bg_worker_do, daemon=True )
         self.bg_worker.start()
 
-    def background_worker_do( self ) -> None:
+        self.bg_worker_tick = 0
+        self.bg_worker_force_gui = False
+
+    def bg_worker_force_gui_update( self ):
+        """"Force a pass in the background worker to enter the GUI pass"""
+        self.bg_worker_force_gui = True
+
+    def bg_worker_do( self ) -> None:
         while True:
+            print( self.bg_worker_tick )
+
+            # scan 'files' folder to track changes
             if self.hasShareableFiles() and self.numShareableFiles != self.prevShareableFiles:
                 """Files have changed"""
                 
@@ -116,6 +134,16 @@ class Application( Tk ):
                 self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_CREATE_FILES ) )
                 self.prevShareableFiles = self.numShareableFiles
 
+            # A GUI update pass, force or every x secconds
+            if self.bg_worker_tick % 10 == 0 or self.bg_worker_force_gui:
+                if self.tk_root.is_frame_active( self.tk_root.FRAME_SHARE_FILES ):
+                    self.tk_root.after(10, self.tk_root.frames[ self.tk_root.FRAME_SHARE_FILES ].updateDevices() )
+                    print("x")
+
+                if self.bg_worker_force_gui:
+                    self.bg_worker_force_gui = False
+
+            self.bg_worker_tick += 1
             time.sleep(1)
 
 if __name__ == '__main__':
