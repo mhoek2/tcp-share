@@ -78,7 +78,7 @@ class GUI_ShareFiles( GuiModule ):
         self.LAN_devices = []
         self.LAN_devices.append( { 'fqdn':'RGD-ITA-001', 'ip':'10.0.40.126', 'gui': {} } )
         self.LAN_devices.append( { 'fqdn':'RGD-ITA-005', 'ip':'10.0.1.63', 'gui': {} } )
-        self.LAN_devices.append( { 'fqdn':'RGD-ITA-002', 'ip':'10.0.1.52', 'gui': {} } )
+        self.LAN_devices.append( { 'fqdn':'RGD-ITA-007', 'ip':'10.0.1.57', 'gui': {} } )
         self.LAN_devices.append( { 'fqdn':'RGD-ITA-006', 'ip':'10.0.151.181', 'gui': {} } )
 
         self.device_frame = {}
