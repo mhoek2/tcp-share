@@ -73,6 +73,7 @@ class TCP:
             received = str( s.recv(1024), "utf-8" ) 
             print(received)
         except socket.timeout:
+            self.client_disconnect( s )
             return False
 
         return s
@@ -82,6 +83,9 @@ class TCP:
 
     def client_send_file( self, server, filename : str, content : str ):
         s = self.client_connect( server )
+
+        if s == False:
+            return False 
 
         send_data = {
             'action' : 'store_file',
