@@ -75,13 +75,13 @@ class Application( Tk ):
                 
                 self.read_write.prevShareableFiles = self.read_write.numShareableFiles
             
-            elif self.read_write.numShareableFiles != self.prevShareableFiles:
+            elif self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
                 """Files have been removed?"""
                 print("Files have been removed?")
                 #self.gui.show_frame( self.gui.FRAME_CREATE_FILES )
 
                 self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_CREATE_FILES ) )
-                self.prevShareableFiles = self.read_write.numShareableFiles
+                self.read_write.prevShareableFiles = self.read_write.numShareableFiles
 
             # A GUI update pass, force or every x secconds
             if self.bg_worker_tick % 10 == 0 or self.bg_worker_force_gui:
