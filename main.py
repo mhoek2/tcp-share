@@ -11,6 +11,7 @@ from modules.app.read_write import ReadWrite
 # app modules
 from modules.crypt import Crypt
 from modules.gui.share_files import GUI_ShareFiles
+from modules.gui.view_files import GUI_ViewFiles
 from modules.tcp import TCP
 from modules.to_pdf import ToPDF
 
@@ -63,27 +64,37 @@ class Application( Tk ):
         while True:
             print( self.bg_worker_tick )
 
+            #
             # scan 'files' folder to track changes
-            
+            #
             if self.read_write.hasShareableFiles() and self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
-                """Files have changed"""
+                """Files found - Files have changed"""
                 
                 print( f"Files have changed? num files: {self.read_write.numShareableFiles}" )
 
-                self.tk_root.after(9, self.tk_root.create_frame( GUI_ShareFiles, self.tk_root.FRAME_SHARE_FILES ) )
-                self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_SHARE_FILES ) )
+                # reload the current frame/page
+                if self.tk_root.current_frame > self.tk_root.FRAME_CREATE_FILES:
+                    reload_frame : bool = True # redundant bool ..
+                    self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.current_frame, reload_frame ) )
                 
+                # go home if previously ther were no files    
+                else:
+                    self.tk_root.goHome()
+
                 self.read_write.prevShareableFiles = self.read_write.numShareableFiles
             
             elif self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
-                """Files have been removed?"""
+                """NO files found - Files have been removed?"""
                 print("Files have been removed?")
                 #self.gui.show_frame( self.gui.FRAME_CREATE_FILES )
 
-                self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_CREATE_FILES ) )
+                reload_frame : bool = True # redundant bool ..
+                self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_CREATE_FILES, reload_frame ) )
                 self.read_write.prevShareableFiles = self.read_write.numShareableFiles
 
+            #
             # A GUI update pass, force or every x secconds
+            #
             if self.bg_worker_tick % 10 == 0 or self.bg_worker_force_gui:
                 if self.tk_root.is_frame_active( self.tk_root.FRAME_SHARE_FILES ):
                     self.tk_root.after(10, self.tk_root.frames[ self.tk_root.FRAME_SHARE_FILES ].updateDevices() )

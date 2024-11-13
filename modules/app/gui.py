@@ -47,15 +47,15 @@ class Gui( tk.Tk ):
         """Register the GUI frames and define a name macro for each"""
 
         # Order needs to match with adjacent for loop Class names
-        self.FRAME_SHARE_FILES = 0;
-        self.FRAME_CREATE_FILES = 1;
+        self.FRAME_CREATE_FILES = 0;
+        self.FRAME_SHARE_FILES = 1;
         self.FRAME_VIEW_FILES = 2;
 
         # Register each GUI module in the self.frames dictionary
         # - If you want to extend this, create a new GUI_* class, 
         #   and import the class at the start of this file
-        for i, module in enumerate((GUI_ShareFiles, 
-                                    GUI_CreateFiles,
+        for i, module in enumerate((GUI_CreateFiles,
+                                    GUI_ShareFiles,
                                     GUI_ViewFiles)):
             self.create_frame( module, i)
 
