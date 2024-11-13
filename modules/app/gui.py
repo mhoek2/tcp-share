@@ -77,7 +77,7 @@ class Gui( tk.Tk ):
         - Need to revisit this method once more frames/pages are added"""
 
         index : int = 0
-        if self.context.hasShareableFiles():
+        if self.context.read_write.hasShareableFiles():
             index = self.FRAME_SHARE_FILES
         else:
             index = self.FRAME_CREATE_FILES

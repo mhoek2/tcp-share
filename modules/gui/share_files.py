@@ -10,7 +10,7 @@ from tkinter.font import BOLD
 class GUI_ShareFiles( GuiModule ):
 
     def send_files( self, server ):
-        files = self.context.getShareableFiles()
+        files = self.context.read_write.getShareableFiles()
         
         print(f"Attempt to share files to: {server}")
         print(files)
@@ -80,7 +80,7 @@ class GUI_ShareFiles( GuiModule ):
         lan_info.configure(font=("Helvetica", 14, "bold"))
         lan_info.pack()
 
-        header = Label( self, text=f"Aantal bestanden gevonden: {self.context.numShareableFiles}")
+        header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
                     
         self.LAN_devices = []
@@ -120,7 +120,7 @@ class GUI_ShareFiles( GuiModule ):
         self.context.bg_worker_force_gui_update()
 
         button = Button( self, text = "Opnieuw Beginnen", 
-               command = lambda : self.context.removeShareableFiles() )
+               command = lambda : self.context.read_write.removeShareableFiles() )
         button.place( x = self.settings.appplication_width - 130, 
                       y = self.settings.appplication_height - 40 )
 
