@@ -6,6 +6,7 @@ from modules.app.settings import Settings
 # import GUI modules
 from modules.gui.create_files import *
 from modules.gui.share_files import *
+from modules.gui.view_files import *
 
 import tkinter as tk
 
@@ -35,7 +36,7 @@ class Gui( tk.Tk ):
 
         self.load_frames()
 
-        self.decide_main_frame()
+        self.goHome()
 
     def create_frame( self, module, i ):
         frame = module( self, self.context )
@@ -48,24 +49,30 @@ class Gui( tk.Tk ):
         # Order needs to match with adjacent for loop Class names
         self.FRAME_SHARE_FILES = 0;
         self.FRAME_CREATE_FILES = 1;
+        self.FRAME_VIEW_FILES = 2;
 
         # Register each GUI module in the self.frames dictionary
         # - If you want to extend this, create a new GUI_* class, 
         #   and import the class at the start of this file
         for i, module in enumerate((GUI_ShareFiles, 
-                                    GUI_CreateFiles )):
+                                    GUI_CreateFiles,
+                                    GUI_ViewFiles)):
             self.create_frame( module, i)
 
     def is_frame_active( self, index ):
         return True if index == self.current_frame else False   
 
-    def show_frame( self, index ):
+    def show_frame( self, index, reload_frame=False ):
         """Hide other frames and show the frame by the index"""
+
+        if reload_frame:
+            self.create_frame( type(self.frames[index]), index)
+        
         frame = self.frames[index]
         frame.tkraise()
         self.current_frame = index
 
-    def decide_main_frame( self ) -> None:
+    def decide_main_frame( self ) -> int:
         """Decide wheter to show 'create' or 'share' files GUI page
         - Need to revisit this method once more frames/pages are added"""
 
@@ -75,4 +82,8 @@ class Gui( tk.Tk ):
         else:
             index = self.FRAME_CREATE_FILES
             
-        self.show_frame( index )
+        return index
+
+    def goHome( self ):
+        self.show_frame( self.decide_main_frame() )
+        return
