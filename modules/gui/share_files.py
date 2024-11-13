@@ -71,6 +71,10 @@ class GUI_ShareFiles( GuiModule ):
     def allowConnectionCheckboxCallback( self ):
         self.settings.allowConnection = self.allowCon.get()
 
+    def goToViewFiles( self ):
+        reload_frame : bool = True # redundant bool ..
+        self.gui.show_frame( self.gui.FRAME_VIEW_FILES, reload_frame )
+
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
         lan_info.configure(font=("Helvetica", 14, "bold"))
@@ -87,6 +91,13 @@ class GUI_ShareFiles( GuiModule ):
 
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
+
+        browse = Button( self, text = "browse", 
+               command = lambda : self.goToViewFiles() )
+        browse.place( x = (self.settings.appplication_width / 2 ) - 25, 
+                      y = self.current_position.y )
+
+        self.current_position.y += 25
 
         self.allowCon = IntVar( value=self.settings.allowConnection )
         c1 = Checkbutton( self, text='Verbindingen Toestaan',variable=self.allowCon, onvalue=1, offvalue=0, 
