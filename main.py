@@ -79,7 +79,7 @@ class Application( Tk ):
                 
                 # go home if previously ther were no files    
                 else:
-                    self.tk_root.goHome()
+                    self.tk_root.after(10, self.tk_root.goHome() )
 
                 self.read_write.prevShareableFiles = self.read_write.numShareableFiles
             
