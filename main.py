@@ -17,25 +17,25 @@ from modules.to_pdf import ToPDF
 
 class Application( Tk ):
     """Base class for this application"""
-    def __init__( self ) -> None:
+    def __init__( self, pytest=False ) -> None:
         self.settings : Settings = Settings()
         self.tcp : TCP = TCP( self ) 
         self.read_write : ReadWrite = ReadWrite()
 
         self.tk_root : Gui = Gui( self )
         
-
         # empty placeholder modules
         self.crypt : Crypt = Crypt( self )
         self.to_pdf : ToPDF = ToPDF( self )
 
-        # background worker to check incoming TCP connections
-        self.tcp_worker()
+        if not pytest:
+            # background worker to check incoming TCP connections
+            self.tcp_worker()
 
-        # background worker for appliction
-        self.bg_worker()
+            # background worker for appliction
+            self.bg_worker()
 
-        self.tk_root.mainloop()
+            self.tk_root.mainloop()
 
     #
     # Keep the following in main for readability (flow-chart)
