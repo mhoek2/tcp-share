@@ -15,6 +15,7 @@ class TCP:
         self.set_local_ip()
 
     def set_local_ip( self ):
+        """Try to get the LAN IP address of the host device"""
         try:
             # Create a temporary socket
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -26,6 +27,10 @@ class TCP:
 
     # server
     def start_server( self ) -> None:
+        """Starts the TCP socker server, use this function as target in a dedicated thread, as it operates in an infinite loop. 
+        This ensures the server can handle incoming connections concurrently 
+        without blocking the main thread."""
+
         s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
         print( f"Start server on: {self.settings.server_ip}:{self.settings.tcp_port} ")
 
@@ -64,6 +69,21 @@ class TCP:
 
     # client
     def client_connect( self, server, timeout=10 ) -> None:
+        """Connect to a socket stream and return the instance, or False on timeout
+
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+           timeout : int    *optional
+                The maximum time in seconds before timeout is hit
+
+           Returns
+           -------
+           socket: If valid connection returns socket instance
+           bool: False if timeout is hit (Failed to connect)
+        """
         s = socket.socket()
         s.settimeout(timeout)
 
@@ -79,9 +99,29 @@ class TCP:
         return s
 
     def client_disconnect( self, s ) -> None:
+        """Close the connection to a socket instance
+
+           Parameters
+           ----------
+           s : socket
+                The socket instance of the closing stream
+           
+        """
         s.close()
 
     def client_send_file( self, server, filename : str, content : str ):
+        """Connect to a socket stream and send over a file, then close the stream
+
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+           filename : str
+                The filename of the file that is sent
+           content : str
+                The content of the file that is sent
+        """
         s = self.client_connect( server )
 
         if s == False:
@@ -108,6 +148,20 @@ class TCP:
         self.client_disconnect( s )
 
     def get_boolean( self, server, parameter ):
+       """Connect to a socket stream and request a boolean state, then close the stream
+
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+           parameter : str
+                The key the server needs to reply the requested boolean state
+
+           Returns
+           -------
+           bool : State returned by the server, or False if request timedout
+       """
        s = self.client_connect( server, 0.5 )
 
        if s == False:
@@ -122,6 +176,18 @@ class TCP:
        return bool( received['value'] ) if 'value' in received else False
 
     def get_allow_receive( self, server ):
+        """Connect to a socket stream and request a boolean state, then close the stream
+
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+
+           Returns
+           -------
+           bool : State of the server allows connections checkbox, or False if request timedout
+        """
         state = self.get_boolean( server, "get_allow_receive" )
 
         if state:
@@ -133,7 +199,18 @@ class TCP:
 
     # ping device
     def ping_device(self, host, network_timeout=1):
-        """Send a ping packet to the specified host, using the system "ping" command."""
+        """Send a ping packet to the specified host, using the system "ping" command.
+          
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+
+           Returns
+           -------
+           bool : True if device is reachable
+        """
         args = [
             'ping'
         ]
