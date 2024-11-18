@@ -23,7 +23,7 @@ class GUI_CreateFiles(GuiModule):
         for i in range:
             self.widgets.append(
                 {
-                    "header": tk.Label(self, text=f"{prefix}{i}"),
+                    "header": tk.Label(self, text=f"{prefix}{(i + 1)}"),
                     "textbox": tk.Text(self, height=6, width=40),
                 }
             )
@@ -38,7 +38,7 @@ class GUI_CreateFiles(GuiModule):
 
     def saveFiles(self):
         for widget in self.widgets:
-            file_name = f"{self.context.settings.filesdir}{widget["header"]["text"]}.txt"
+            file_name = f"{self.context.settings.filesdir}{widget['header']['text']}.txt"
             file_path = Path(file_name)
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_content = widget["textbox"].get(1.0, "end-1c")
@@ -71,8 +71,8 @@ class GUI_CreateFiles(GuiModule):
 
         self.current_position.y += 25
 
-        numfiles = range(1, self.context.settings.num_files + 1)
 
+        numfiles = range(0, self.context.settings.num_files)
         self.drawWidgets(numfiles)
 
         save_button = tk.Button(self, text="Opslaan", command=self.saveFiles)
