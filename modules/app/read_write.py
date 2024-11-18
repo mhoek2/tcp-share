@@ -69,11 +69,7 @@ class ReadWrite:
     def writeFiles(self, path: Path | str, content: str):
         """Function to write content to files."""
         if isinstance(path, str):
-            path = (
-                Path(path)
-                if Path(path).is_absolute()
-                else Path(self.dir).joinpath(path)
-            )
+            path = Path(path) if Path(path).is_absolute() else Path(self.dir).joinpath(path)
 
         path.parent.mkdir(parents=True, exist_ok=True)
 
