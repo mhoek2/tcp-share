@@ -1,5 +1,5 @@
-# Notes created by the calculator
-notes/*
+# Files created by the application
+files/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from modules.app.settings import Settings
 
@@ -44,12 +45,13 @@ class ReadWrite:
                 file_path = os.path.join(self.settings.filesdir, filename)
 
                 if os.path.isfile(file_path):
-                    # need to read the content of the file ..
-                    # use hardcoded test data for now
+                    file_pathlib = Path(file_path)
+                    file_contents = file_pathlib.read_text()
+                    
                     files.append(
                         {
                             "filename": filename,
-                            "content": "hard-coded content from def app.getShareableFiles()",
+                            "content": file_contents,
                         }
                     )
 
