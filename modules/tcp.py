@@ -52,7 +52,11 @@ class TCP:
                 # request to store a file
                 if rcv_data['action'] == "store_file":
                     if self.settings.allowConnection:
-                        print( f"received file: {rcv_data['file']}" )
+                        file = rcv_data['file']
+                        print( f"received file: {file}" )
+                        filename = file['filename']
+                        content = file['content']
+                        self.context.read_write.writeFiles(filename, content)
                         send_data = { 'success': 'File received successfully!' }
                     else:
                         print("Connections is refused!")

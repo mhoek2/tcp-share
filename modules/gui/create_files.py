@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import TypedDict
 from modules.app.helper import Vector2
 
@@ -38,12 +37,9 @@ class GUI_CreateFiles(GuiModule):
 
     def saveFiles(self):
         for widget in self.widgets:
-            file_name = f"{self.context.settings.filesdir}{widget['header']['text']}.txt"
-            file_path = Path(file_name)
-            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_name = f"{widget['header']['text']}.txt"
             file_content = widget["textbox"].get(1.0, "end-1c")
-            file_path.write_text(file_content)
-            print(f"{file_path} saved with following contents:\n{file_content}\n----------------")
+            self.context.read_write.writeFiles(file_name, file_content)
 
     def onStart(self):
         lan_info = tk.Label(
@@ -70,7 +66,6 @@ class GUI_CreateFiles(GuiModule):
         c1.place(x=15, y=self.current_position.y)
 
         self.current_position.y += 25
-
 
         numfiles = range(0, self.context.settings.num_files)
         self.drawWidgets(numfiles)
