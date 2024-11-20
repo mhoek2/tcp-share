@@ -11,6 +11,7 @@ class Settings:
 
         self.rootdir = Path.cwd()
         self.filesdir = f"{self.rootdir}\\files\\"
+        self.pdf_filesdir = f"{self.rootdir}\\pdf_files\\"
         self.password_file = "passwords.secret"
 
         # placeholder to illustrate good practice of keeping things dynamic

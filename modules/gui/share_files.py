@@ -7,6 +7,9 @@ from modules.gui.gui_module import GuiModule
 from tkinter import *
 from tkinter.font import BOLD
 
+import subprocess
+from pathlib import Path
+
 class GUI_ShareFiles( GuiModule ):
 
     def openSendChoiceModal( self, server ):
@@ -103,6 +106,28 @@ class GUI_ShareFiles( GuiModule ):
         reload_frame : bool = True # redundant bool ..
         self.gui.show_frame( self.gui.FRAME_VIEW_FILES, reload_frame )
 
+    def openPDFFolderInExplorer( self ):
+        print( f"open pdf folder: {self.settings.pdf_filesdir}" )
+
+        folder_path = Path(self.settings.pdf_filesdir)
+
+        folder_path.mkdir(parents=True, exist_ok=True)
+
+        subprocess.run(['explorer', str(folder_path)])
+
+    def drawBrowseButtons( self ) -> None:
+        browse_txt = Button( self, text = "browse txt", 
+               command = lambda : self.goToViewFiles() )
+        browse_txt.place( x = (self.settings.appplication_width / 2 ) - 125, 
+                      y = self.current_position.y )
+
+        browse_pdf = Button( self, text = "browse pdf", 
+               command = lambda : self.openPDFFolderInExplorer() )
+        browse_pdf.place( x = (self.settings.appplication_width / 2 ) + 25, 
+                      y = self.current_position.y )
+
+        self.current_position.y += 25
+
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
         lan_info.configure(font=("Helvetica", 14, "bold"))
@@ -120,12 +145,7 @@ class GUI_ShareFiles( GuiModule ):
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
 
-        browse = Button( self, text = "browse", 
-               command = lambda : self.goToViewFiles() )
-        browse.place( x = (self.settings.appplication_width / 2 ) - 25, 
-                      y = self.current_position.y )
-
-        self.current_position.y += 25
+        self.drawBrowseButtons()
 
         self.allowCon = IntVar( value=self.settings.allowConnection )
         c1 = Checkbutton( self, text='Verbindingen Toestaan',variable=self.allowCon, onvalue=1, offvalue=0, 
