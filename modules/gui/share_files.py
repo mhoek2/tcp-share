@@ -9,7 +9,30 @@ from tkinter.font import BOLD
 
 class GUI_ShareFiles( GuiModule ):
 
-    def send_files( self, server ):
+    def openSendChoiceModal( self, server ):
+        # Create a new Toplevel window (modal)
+        modal = Toplevel( self.gui )
+        modal.title( f"Keuze" )
+        modal.grab_set()
+
+        Label(modal, text=f"Tekstbestanden of PDF's versturen naar \n {server[0]}:{server[1]}?").pack( pady=10 )
+    
+        Button( modal, text="Tekst", command=lambda: 
+               self.sendChoiceModalCallback( server, modal, "Tekst" ) ).pack( side=LEFT, padx=20, pady=20 )
+
+        Button( modal, text="PDF", command=lambda: 
+               self.sendChoiceModalCallback( server, modal, "PDF" ) ).pack( side=RIGHT, padx=20, pady=20 )
+
+    def sendChoiceModalCallback( self, server, modal, choice ):
+        if choice == "PDF":
+            print( f"Create and send pdf! {server}")
+        else:
+            print( f"Send txt! {server}")
+            self.send_txt_files( server )
+
+        modal.destroy()
+
+    def send_txt_files( self, server ):
         files = self.context.read_write.getShareableFiles()
         
         print(f"Attempt to share files to: {server}")
@@ -17,6 +40,14 @@ class GUI_ShareFiles( GuiModule ):
 
         for file in files:
             self.context.tcp.client_send_file( server, file['filename'], file['content'] )
+
+    def send_pdf_file( self, server ):
+        #files = self.context.read_write.getShareablePDFFiles()
+        
+        print(f"Attempt to share PDF files to: {server}")
+
+        #for file in files:
+        #    self.context.tcp.client_send_file( server, file['filename'], file['content'] )
 
     def updateDevice( self, device ):
         is_online = True if self.context.tcp.ping_device( device['ip'] ) else False
@@ -56,12 +87,9 @@ class GUI_ShareFiles( GuiModule ):
         device['gui']['status_indicator'].place( x=-0, y=-0, width=3, heigh =45 ) 
 
         pos_x = 10
-        j = 0;
         device['gui']['send'] = Button( frame, text = device['hostname'], state=DISABLED,
-                command = lambda param=( device['ip'], self.settings.tcp_port ): self.send_files(param) )
+                command = lambda param=( device['ip'], self.settings.tcp_port ): self.openSendChoiceModal(param) )
         device['gui']['send'].place( y=10, x=pos_x )
-
-        j += 1
 
         device['gui']['status'] = Label( frame, text=f"-")
         device['gui']['status'].place( x = 300, y = 10 ) 
