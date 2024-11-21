@@ -36,7 +36,7 @@ class GUI_ShareFiles( GuiModule ):
         modal.destroy()
 
     def send_txt_files( self, server ):
-        files = self.context.read_write.getShareableFiles()
+        files = self.context.read_write.getTextFiles()
         
         print(f"Attempt to share files to: {server}")
         print(files)
@@ -168,7 +168,7 @@ class GUI_ShareFiles( GuiModule ):
         self.context.bg_worker_force_gui_update()
 
         button = Button( self, text = "Opnieuw Beginnen", 
-               command = lambda : self.context.read_write.removeShareableFiles() )
+               command = lambda : self.context.read_write.removeTextFiles() )
         button.place( x = self.settings.appplication_width - 130, 
                       y = self.settings.appplication_height - 40 )
 

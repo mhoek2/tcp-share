@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from modules.app.settings import Settings
@@ -11,66 +10,64 @@ class ReadWrite:
 
         self.numShareableFiles: int = 0
         self.prevShareableFiles: int = 0
-        self.dir = self.settings.filesdir
 
-    def hasShareableFiles(self) -> bool:
-        """Check if there are files available for sharing
-        - should be extended to return two booleans:
-          1. if files exists
-          2. if salts/password file exists"""
+        self.dir = Path(self.settings.filesdir).resolve()
+        self.textDir = self.dir.joinpath("txt")
+        self.pdfDir = self.dir.joinpath("pdf")
 
-        num_files = 0
-
-        if os.path.exists(self.dir) and not os.path.isfile(self.dir):
-            # Checking if the directory is not empty
-            if os.listdir(self.dir):
-                # Count sharable files
-                for filename in os.listdir(self.dir):
-                    file_path = os.path.join(self.dir, filename)
-
-                    if os.path.isfile(file_path):
-                        num_files += 1
-
-        self.numShareableFiles = num_files
-        return True if num_files > 0 else False
-
-    def getShareableFiles(self) -> list:
-        """Return list of files"""
+    def getFiles(self, path: Path) -> list:
+        """Get all files in a certain directory."""
         files = []
 
-        if self.hasShareableFiles():
-            for i, filename in enumerate(os.listdir(self.dir)):
-                file_path = os.path.join(self.dir, filename)
-
-                if os.path.isfile(file_path):
-                    file_pathlib = Path(file_path)
-                    file_contents = file_pathlib.read_text()
-
-                    files.append(
-                        {
-                            "filename": filename,
-                            "content": file_contents,
-                        }
-                    )
+        if any(path.glob("*")):
+            for file in path.glob("*"):
+                files.append({"filename": file.name, "contents": file.read_text()})
 
         return files
 
-    def removeShareableFiles(self):
-        """Remove local shareable files"""
-        print("Remove local shareable files")
-        if self.hasShareableFiles():
-            for filename in os.listdir(self.dir):
-                file_path = os.path.join(self.dir, filename)
+    def removeFiles(self, path: Path) -> None:
+        """Remove all files in a certain directory."""
+        for file in path.glob("*"):
+            if file.is_file():
+                file.unlink()
 
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-        return
+    def hasTextFiles(self) -> bool:
+        """Check if there are any text files."""
+        files = self.getFiles(self.textDir)
+        self.numShareableFiles = len(files)
+        return bool(files)
 
-    def writeFiles(self, path_str: str, content: str):
+    def getTextFiles(self) -> list:
+        """Get all text files."""
+        return self.getFiles(self.textDir)
+
+    def removeTextFiles(self) -> None:
+        """Remove all text files."""
+        if self.hasTextFiles:
+            self.removeFiles(self.textDir)
+
+    def hasPdfFiles(self) -> bool:
+        """Check if there are any text files."""
+        return bool(self.getFiles(self.pdfDir))
+
+    def getPdfFiles(self) -> list:
+        """Get all text files."""
+        return self.getFiles(self.pdfDir)
+
+    def removePdfFiles(self) -> None:
+        """Remove all pdf files."""
+        if self.hasPdfFiles:
+            self.removeFiles(self.pdfDir)
+
+    def writeFile(self, path: Path, contents: str) -> None:
         """Function to write content to files."""
-        path = Path(path_str) if Path(path_str).is_absolute() else Path(self.dir).joinpath(path_str)
 
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        path.write_text(content)
-        print(f"{path} saved with following contents:\n{content}")
+        path.write_text(contents)
+        print(f"{path} saved with following contents:\n{contents}")
+
+    def writeTextFile(self, file_name: str, contents: str):
+        """Write a text file."""
+        file_path = self.textDir.joinpath(file_name)
+        self.writeFile(file_path, contents)

@@ -67,7 +67,7 @@ class Application( Tk ):
             #
             # scan 'files' folder to track changes
             #
-            if self.read_write.hasShareableFiles() and self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
+            if self.read_write.hasTextFiles() and self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
                 """Files found - Files have changed"""
                 
                 print( f"Files have changed? num files: {self.read_write.numShareableFiles}" )

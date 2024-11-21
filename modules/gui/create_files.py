@@ -39,7 +39,7 @@ class GUI_CreateFiles(GuiModule):
         for widget in self.widgets:
             file_name = f"{widget['header']['text']}.txt"
             file_content = widget["textbox"].get(1.0, "end-1c")
-            self.context.read_write.writeFiles(file_name, file_content)
+            self.context.read_write.writeTextFile(file_name, file_content)
 
     def onStart(self):
         lan_info = tk.Label(

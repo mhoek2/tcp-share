@@ -13,7 +13,7 @@ class GUI_ViewFiles( GuiModule ):
         header.pack( side=TOP, fill='x' )
 
         file['gui']['text'] = ScrolledText( frame , height=7, width=46 ) 
-        file['gui']['text'].insert( END, file['content'] ) 
+        file['gui']['text'].insert( END, file['contents'] ) 
         file['gui']['text'].config( state=DISABLED )
         file['gui']['text'].pack( side=TOP, pady=5, padx=4 ) 
 
@@ -61,7 +61,7 @@ class GUI_ViewFiles( GuiModule ):
         content_frame = Frame( self.canvas )
 
         # content
-        self.files = self.context.read_write.getShareableFiles()
+        self.files = self.context.read_write.getTextFiles()
         for file in self.files:
             self.hasPasswordFile( file )
 
