@@ -8,18 +8,14 @@ from tkinter.scrolledtext import ScrolledText
 
 class GUI_ViewFiles( GuiModule ):
 
-    def drawFile( self, file ):
-        header = Label( self, text=f"{file['filename']}")
-        header.place( x = 0, y = self.current_position.y )
+    def drawFile( self, file, frame ):
+        header = Label( frame, text=f"{file['filename']}", anchor='w')
+        header.pack( side=TOP, fill='x' )
 
-        self.current_position.y += 25
-
-        file['gui']['text'] = ScrolledText( self , height=8, width=46 ) 
+        file['gui']['text'] = ScrolledText( frame , height=7, width=46 ) 
         file['gui']['text'].insert( END, file['content'] ) 
         file['gui']['text'].config( state=DISABLED )
-        file['gui']['text'].place( x = 5, y = self.current_position.y ) 
-
-        self.current_position.y += 135
+        file['gui']['text'].pack( side=TOP, pady=5, padx=4 ) 
 
     def encryptOrDecryptFiles( self, state ):
         print(f"State = {int(state)} aka: {self.crypt_button_text[state]} ")
@@ -31,6 +27,11 @@ class GUI_ViewFiles( GuiModule ):
         if file['filename'] == self.settings.password_file:
             self.is_encrypted = True
 
+
+    def on_frame_configure(self, event):
+        # Update the scrollregion of the canvas whenever the content frame's size changes
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
     def onStart( self ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
@@ -41,13 +42,39 @@ class GUI_ViewFiles( GuiModule ):
 
         self.current_position = Vector2( 0, 50 )
 
+        # frame
+        frame = Frame( self )
+        frame.place(  y = self.current_position.y,
+                      width=self.settings.appplication_width, 
+                      height=self.settings.appplication_height - 125 )
+
+        # canvas
+        self.canvas = Canvas( frame, bg='white' )
+        self.canvas.pack( side=LEFT, fill='both', expand=True )
+
+        # scrollbar
+        y_scrollbar = Scrollbar( frame, orient=VERTICAL, command=self.canvas.yview )
+        y_scrollbar.pack( side=RIGHT, fill=Y )
+        self.canvas.configure(yscrollcommand=y_scrollbar.set)
+
+        # canvas, again
+        content_frame = Frame( self.canvas )
+
+        # content
         self.files = self.context.read_write.getShareableFiles()
         for file in self.files:
             self.hasPasswordFile( file )
 
             file['gui'] = {}
-            self.drawFile( file )
+            self.drawFile( file, content_frame )
 
+        # update region of canvas
+        self.canvas.create_window((0, 0), window=content_frame, anchor='nw')
+        content_frame.update_idletasks()
+        self.canvas.config( scrollregion=self.canvas.bbox( "all" ) )
+        content_frame.bind( "<Configure>", self.on_frame_configure )
+
+        # footer buttons
         crypt = Button( self, text = self.crypt_button_text[self.is_encrypted], 
                command = lambda : self.encryptOrDecryptFiles( self.is_encrypted ) )
         crypt.place( x = self.settings.appplication_width - 70, 
