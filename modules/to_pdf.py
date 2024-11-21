@@ -27,7 +27,8 @@ class ToPDF:
 
             file_pathlib = Path(f"{self.settings.filesdir}{file['filename']}")
             file_contents = file_pathlib.read_text()
-            pdf.cell(0, 10, txt=file_contents.strip(), ln=True)
+            #pdf.cell(0, 10, txt=file_contents.strip(), ln=True)
+            pdf.multi_cell(0, 10, txt=file_contents)
 
             output_filename = file['filename'].replace("txt", "pdf")
             pdf.output(f"{self.settings.pdf_filesdir}{output_filename}")
