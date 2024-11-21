@@ -91,5 +91,6 @@ class Gui( tk.Tk ):
         return index
 
     def goHome( self ):
-        self.show_frame( self.decide_main_frame() )
+        reload_frame : bool = True # redundant bool ..
+        self.show_frame( self.decide_main_frame(), reload_frame )
         return
