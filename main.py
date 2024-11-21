@@ -86,10 +86,8 @@ class Application( Tk ):
             elif self.read_write.numShareableFiles != self.read_write.prevShareableFiles:
                 """NO files found - Files have been removed?"""
                 print("Files have been removed?")
-                #self.gui.show_frame( self.gui.FRAME_CREATE_FILES )
 
-                reload_frame : bool = True # redundant bool ..
-                self.tk_root.after(10, self.tk_root.show_frame( self.tk_root.FRAME_CREATE_FILES, reload_frame ) )
+                self.tk_root.after(10, self.tk_root.goHome() )
                 self.read_write.prevShareableFiles = self.read_write.numShareableFiles
 
             #
