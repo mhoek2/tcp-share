@@ -34,7 +34,7 @@ class GUI_DecryptFiles( GuiModule ):
         self.current_position = Vector2( 0, 50 )
 
         # Read file directory and check if 'password.secret' exists
-        self.files = self.context.read_write.getShareableFiles()
+        self.files = self.context.read_write.getTextFiles()
         for file in self.files:
             self.hasPasswordFile( file )
 

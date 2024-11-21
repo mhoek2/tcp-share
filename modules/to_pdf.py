@@ -14,10 +14,10 @@ class ToPDF:
 
 
     def txt_to_pdf(self):
-        if not self.read_write.hasShareableFiles():
+        if not self.read_write.hasTextFiles():
             return
 
-        files = self.read_write.getShareableFiles()
+        files = self.read_write.getTextFiles()
         for file in files:
             # Initialize PDF
             pdf = FPDF()

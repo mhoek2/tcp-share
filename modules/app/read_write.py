@@ -11,59 +11,52 @@ class ReadWrite:
 
         self.numShareableFiles: int = 0
         self.prevShareableFiles: int = 0
+
+        self.numPDFFiles: int = 0
+        self.prevnumPDFFiles: int = 0
+
         self.dir = self.settings.filesdir
 
-    def hasShareableFiles(self) -> bool:
-        """Check if there are files available for sharing
-        - should be extended to return two booleans:
-          1. if files exists
-          2. if salts/password file exists"""
-
-        num_files = 0
-
-        if os.path.exists(self.dir) and not os.path.isfile(self.dir):
-            # Checking if the directory is not empty
-            if os.listdir(self.dir):
-                # Count sharable files
-                for filename in os.listdir(self.dir):
-                    file_path = os.path.join(self.dir, filename)
-
-                    if os.path.isfile(file_path):
-                        num_files += 1
-
-        self.numShareableFiles = num_files
-        return True if num_files > 0 else False
-
-    def getShareableFiles(self) -> list:
+    def getFiles( self, path_str: str, count_only: bool = False ) -> list:
         """Return list of files"""
         files = []
+        num_files = 0
 
-        if self.hasShareableFiles():
-            for i, filename in enumerate(os.listdir(self.dir)):
-                file_path = os.path.join(self.dir, filename)
+        if not os.path.exists( path_str ) or os.path.isfile( path_str ):
+            return
 
-                if os.path.isfile(file_path):
-                    file_pathlib = Path(file_path)
-                    file_contents = file_pathlib.read_text()
+        for i, filename in enumerate( os.listdir( path_str ) ):
+            file_path = os.path.join( path_str, filename )
 
-                    files.append(
-                        {
-                            "filename": filename,
-                            "content": file_contents,
-                        }
-                    )
+            if os.path.isfile( file_path ):
+                num_files += 1
+
+                # count files
+                if count_only: 
+                    files.append( num_files )
+                    continue
+
+                # read files
+                file_pathlib = Path( file_path )
+                file_contents = file_pathlib.read_text()
+
+                files.append(
+                    {
+                        "filename": filename,
+                        "content": file_contents,
+                    }
+                )
 
         return files
 
-    def removeShareableFiles(self):
-        """Remove local shareable files"""
-        print("Remove local shareable files")
-        if self.hasShareableFiles():
-            for filename in os.listdir(self.dir):
-                file_path = os.path.join(self.dir, filename)
+    def removeFiles( self, path_str: str ):
+        """Remove files in dir"""
+        for filename in os.listdir( path_str ):
+            file_path = os.path.join( path_str, filename )
 
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
+            if os.path.isfile( file_path ):
+                os.unlink( file_path )
+
         return
 
     def writeFiles(self, path_str: str, content: str):
@@ -74,3 +67,34 @@ class ReadWrite:
 
         path.write_text(content)
         print(f"{path} saved with following contents:\n{content}")
+
+    #
+    # Wrapper functions
+    #
+    def hasTextFiles( self ) -> bool:
+        """Are ther any files in files dir"""
+        count_only : bool = True
+        files : list = self.getFiles( self.settings.filesdir, count_only )
+       
+        self.numShareableFiles = len( files )
+        return True if self.numShareableFiles > 0 else False
+    
+    def hasPDFFiles( self ) -> bool:
+        """Are ther any files in PDF files dir"""
+        count_only : bool = True
+        files : list = self.getFiles( self.settings.pdf_filesdir, count_only )
+        
+        self.numPDFFiles = len( files )
+        return True if self.numPDFFiles > 0 else False
+
+    def getTextFiles( self ) -> list:
+        return self.getFiles( self.settings.filesdir )
+
+    def getPDFFiles( self ) -> list:
+        return self.getFiles( self.settings.pdf_filesdir )
+
+    def removeTextFiles( self ):
+        self.removeFiles( self.settings.filesdir )
+
+    def removePDFFiles( self ):
+        self.removeFiles( self.settings.pdf_filesdir )

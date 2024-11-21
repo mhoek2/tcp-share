@@ -61,7 +61,7 @@ class GUI_ViewFiles( GuiModule ):
         content_frame = Frame( self.canvas )
 
         # content
-        self.files = self.context.read_write.getShareableFiles()
+        self.files = self.context.read_write.getTextFiles()
         for file in self.files:
             self.hasPasswordFile( file )
 
