@@ -40,7 +40,7 @@ class GUI_EncryptFiles( GuiModule ):
         back.place( x = 20, 
                       y = self.settings.appplication_height - 40 )
 
-        self.files = self.context.read_write.getShareableFiles()
+        self.files = self.context.read_write.getTextFiles()
         for file in self.files:
             self.hasPasswordFile( file )
 

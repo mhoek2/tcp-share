@@ -56,7 +56,7 @@ class TCP:
                         print( f"received file: {file}" )
                         filename = file['filename']
                         content = file['content']
-                        self.context.read_write.writeFiles(filename, content)
+                        self.context.read_write.writeTextFile(filename, content)
                         send_data = { 'success': 'File received successfully!' }
                     else:
                         print("Connections is refused!")
