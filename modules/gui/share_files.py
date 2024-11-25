@@ -107,13 +107,13 @@ class GUI_ShareFiles( GuiModule ):
         self.gui.show_frame( self.gui.FRAME_VIEW_FILES, reload_frame )
 
     def openPDFFolderInExplorer( self ):
-        print( f"open pdf folder: {self.settings.pdf_filesdir}" )
+        print( f"open pdf folder: {self.context.read_write.pdfDir}" )
 
-        folder_path = Path(self.settings.pdf_filesdir)
+        folder_path = self.context.read_write.pdfDir
 
         folder_path.mkdir(parents=True, exist_ok=True)
 
-        subprocess.run(['explorer', str(folder_path)])
+        subprocess.run(['explorer', folder_path])
 
     def create_pdf( self ):
         self.context.to_pdf.txt_to_pdf()
