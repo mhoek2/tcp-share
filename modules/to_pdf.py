@@ -25,10 +25,23 @@ class ToPDF:
             pdf.add_page()
             pdf.set_font("Courier", size=12)
 
-            file_pathlib = Path(f"{self.settings.filesdir}{file['filename']}")
-            file_contents = file_pathlib.read_text()
             #pdf.cell(0, 10, txt=file_contents.strip(), ln=True)
-            pdf.multi_cell(0, 10, txt=file_contents)
+            pdf.multi_cell(0, 10, txt=file['contents'].decode() )
 
-            output_filename = file['filename'].replace("txt", "pdf")
-            pdf.output(f"{self.settings.pdf_filesdir}{output_filename}")
+            path = Path(self.settings.filesdir).resolve()
+            path = path.joinpath("pdf")
+            path = path.joinpath(file['filename'].replace("txt", "pdf"))
+
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+            # save using pathlib?
+            use_pathlib = True
+
+            if use_pathlib:
+                pdf_bytes = pdf.output(dest='S').encode('latin1')
+                pdf_bytearray = bytearray(pdf_bytes)
+                path.write_bytes( pdf_bytearray )
+            else:
+                pdf.output( str( path ) )
+
+
