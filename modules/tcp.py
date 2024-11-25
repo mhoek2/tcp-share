@@ -5,6 +5,7 @@ import socket
 import json
 import subprocess
 import platform
+import base64
 
 class TCP:
     def __init__( self, context ) -> None:
@@ -55,7 +56,14 @@ class TCP:
                         print( f"received file: {file}" )
                         filename = file['filename']
                         content = file['contents']
-                        self.context.read_write.writeTextFile(filename, content)
+
+                        if file['is_bytes']:
+                            print("write bytes")
+                            content_bytes = base64.b64decode( content )
+                            self.context.read_write.writePdfFile( filename, content_bytes )
+                        else:
+                            self.context.read_write.writeTextFile( filename, content )
+
                         send_data = { 'success': 'File received successfully!' }
                     else:
                         print("Connections is refused!")
@@ -131,10 +139,17 @@ class TCP:
         if s == False:
             return False 
 
+        is_bytes = False
+
+        if isinstance( content, bytes ):
+            is_bytes = True
+            content = base64.b64encode(content).decode('utf-8') 
+
         send_data = {
             'action' : 'store_file',
             'file': {
                     'filename': filename,
+                    'is_bytes': is_bytes,
                     'contents': content
                 }
             }
