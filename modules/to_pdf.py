@@ -28,8 +28,7 @@ class ToPDF:
             #pdf.cell(0, 10, txt=file_contents.strip(), ln=True)
             pdf.multi_cell(0, 10, txt=file['contents'].decode() )
 
-            path = Path(self.settings.filesdir).resolve()
-            path = path.joinpath("pdf")
+            path = Path(self.read_write.pdfDir).resolve()
             path = path.joinpath(file['filename'].replace("txt", "pdf"))
 
             path.parent.mkdir(parents=True, exist_ok=True)
