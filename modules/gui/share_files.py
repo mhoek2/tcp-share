@@ -42,7 +42,7 @@ class GUI_ShareFiles( GuiModule ):
         print(files)
 
         for file in files:
-            self.context.tcp.client_send_file( server, file['filename'], file['contents'] )
+            self.context.tcp.client_send_file( server, file['filename'], file['contents'].decode() )
 
     def send_pdf_file( self, server ):
         #files = self.context.read_write.getShareablePDFFiles()
