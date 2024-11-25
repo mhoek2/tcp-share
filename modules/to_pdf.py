@@ -1,17 +1,20 @@
+from typing import TYPE_CHECKING
+
 # app core modules
-from modules.app.settings import Settings
-from pathlib import Path
 from fpdf import FPDF
+
 from modules.app.read_write import ReadWrite
+from modules.app.settings import Settings
+
+if TYPE_CHECKING:
+    from main import Application
 
 
 class ToPDF:
     def __init__(self, context) -> None:
-        self.context = context
+        self.context: "Application" = context
         self.settings: Settings = context.settings
         self.read_write: ReadWrite = context.read_write
-        #self.txt_to_pdf()
-
 
     def txt_to_pdf(self):
         if not self.read_write.hasTextFiles():
@@ -25,22 +28,9 @@ class ToPDF:
             pdf.add_page()
             pdf.set_font("Courier", size=12)
 
-            #pdf.cell(0, 10, txt=file_contents.strip(), ln=True)
-            pdf.multi_cell(0, 10, txt=file['contents'].decode() )
+            pdf.multi_cell(0, 10, txt=file["contents"].decode())
+            
+            output_filename = file["filename"].replace("txt", "pdf")
+            output = pdf.output(dest="S").encode("latin1")
 
-            path = Path(self.read_write.pdfDir).resolve()
-            path = path.joinpath(file['filename'].replace("txt", "pdf"))
-
-            path.parent.mkdir(parents=True, exist_ok=True)
-
-            # save using pathlib?
-            use_pathlib = True
-
-            if use_pathlib:
-                pdf_bytes = pdf.output(dest='S').encode('latin1')
-                pdf_bytearray = bytearray(pdf_bytes)
-                path.write_bytes( pdf_bytearray )
-            else:
-                pdf.output( str( path ) )
-
-
+            self.context.read_write.writePdfFile(output_filename, output)
