@@ -42,8 +42,7 @@ class TCP:
             print( f"Connection from: {addr[0]}:{addr[1]}" )
             c.send( b"Welcome client!" )
 
-            received = str(c.recv(1024), "utf-8") 
-
+            received = c.recv( self.settings.bufsize_payload ).decode('utf-8')
             rcv_data = json.loads( received )
 
             send_data = { }
@@ -93,8 +92,9 @@ class TCP:
 
         try:
             s.connect( ( server[0], server[1] ) )
-
-            received = str( s.recv(1024), "utf-8" ) 
+ 
+            received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+ 
             print(received)
         except socket.timeout:
             self.client_disconnect( s )
@@ -141,8 +141,9 @@ class TCP:
 
         s.sendall( bytes( json.dumps( send_data ) + "\n", "utf-8" ) ) # Send data
         
-        rcv_data = json.loads( str( s.recv(1024), "utf-8" ) )
-        
+        received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+        rcv_data = json.loads( received )
+
         if 'success' in rcv_data:
             print( rcv_data['success'] )
 
@@ -173,11 +174,12 @@ class TCP:
 
        s.sendall( bytes( json.dumps( { 'action' : parameter } ) + "\n", "utf-8" ) ) # Send data
        
-       received = json.loads( str( s.recv(1024), "utf-8" ) )
+       received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+       rcv_data = json.loads( received )
 
        self.client_disconnect( s )
 
-       return bool( received['value'] ) if 'value' in received else False
+       return bool( rcv_data['value'] ) if 'value' in rcv_data else False
 
     def get_allow_receive( self, server ):
         """Connect to a socket stream and request a boolean state, then close the stream
