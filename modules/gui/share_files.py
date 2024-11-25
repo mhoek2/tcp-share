@@ -107,13 +107,17 @@ class GUI_ShareFiles( GuiModule ):
         self.gui.show_frame( self.gui.FRAME_VIEW_FILES, reload_frame )
 
     def openPDFFolderInExplorer( self ):
-        print( f"open pdf folder: {self.settings.pdf_filesdir}" )
+        print( f"open pdf folder: {self.context.read_write.pdfDir}" )
 
-        folder_path = Path(self.settings.pdf_filesdir)
+        folder_path = self.context.read_write.pdfDir
 
         folder_path.mkdir(parents=True, exist_ok=True)
 
-        subprocess.run(['explorer', str(folder_path)])
+        subprocess.run(['explorer', folder_path])
+
+    def create_pdf( self ):
+        self.context.to_pdf.txt_to_pdf()
+        print("create pdf")
 
     def drawBrowseButtons( self ) -> None:
         browse_txt = Button( self, text = "browse txt", 
@@ -121,11 +125,22 @@ class GUI_ShareFiles( GuiModule ):
         browse_txt.place( x = (self.settings.appplication_width / 2 ) - 125, 
                       y = self.current_position.y )
 
-        browse_pdf = Button( self, text = "browse pdf", 
-               command = lambda : self.openPDFFolderInExplorer() )
-        browse_pdf.place( x = (self.settings.appplication_width / 2 ) + 25, 
-                      y = self.current_position.y )
+        # If PDF files exist, draw browse button
+        # Otherwise draw the create button
+        #
+        # Note: It is allowed to create variable 'browse_pdf' 
+        # in the scope of the if else block and use it afterwards in python
+        # it seems ..
+        if self.context.read_write.hasPdfFiles():
+            browse_pdf = Button( self, text = "browse pdf", 
+                   command = lambda : self.openPDFFolderInExplorer() )
+        else:
+            browse_pdf = Button( self, text = "create pdf", 
+                   command = lambda : self.create_pdf() )
 
+        browse_pdf.place( x = (self.settings.appplication_width / 2 ) + 25, 
+                          y = self.current_position.y )        
+        
         self.current_position.y += 25
 
     def onStart( self ):

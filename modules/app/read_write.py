@@ -72,3 +72,12 @@ class ReadWrite:
         """Write a text file."""
         file_path = self.textDir.joinpath(file_name)
         self.writeFile(file_path, contents)
+
+    def writePdfFile(self, file_name: str, contents: bytes):
+        """Write a text file."""
+        file_path = self.pdfDir.joinpath(file_name)
+
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        file_path.write_bytes(contents)
+        print(f"{file_path} saved succesfully!")
