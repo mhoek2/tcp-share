@@ -42,7 +42,7 @@ class GUI_ShareFiles( GuiModule ):
         print(files)
 
         for file in files:
-            self.context.tcp.client_send_file( server, file['filename'], file['content'] )
+            self.context.tcp.client_send_file( server, file['filename'], file['contents'] )
 
     def send_pdf_file( self, server ):
         #files = self.context.read_write.getShareablePDFFiles()
@@ -50,7 +50,7 @@ class GUI_ShareFiles( GuiModule ):
         print(f"Attempt to share PDF files to: {server}")
 
         #for file in files:
-        #    self.context.tcp.client_send_file( server, file['filename'], file['content'] )
+        #    self.context.tcp.client_send_file( server, file['filename'], file['contents'] )
 
     def updateDevice( self, device ):
         is_online = True if self.context.tcp.ping_device( device['ip'] ) else False

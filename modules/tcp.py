@@ -55,7 +55,7 @@ class TCP:
                         file = rcv_data['file']
                         print( f"received file: {file}" )
                         filename = file['filename']
-                        content = file['content']
+                        content = file['contents']
                         self.context.read_write.writeTextFile(filename, content)
                         send_data = { 'success': 'File received successfully!' }
                     else:
@@ -135,7 +135,7 @@ class TCP:
             'action' : 'store_file',
             'file': {
                     'filename': filename,
-                    'content': content
+                    'contents': content
                 }
             }
 
