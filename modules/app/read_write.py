@@ -22,7 +22,7 @@ class ReadWrite:
         if any(path.glob("*")):
             for file in path.glob("*"):
                 if file.is_file():
-                    files.append({"filename": file.name, "contents": file.read_text()})
+                    files.append({"filename": file.name, "contents": file.read_bytes()})
 
         return files
 
