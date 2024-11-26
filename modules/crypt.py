@@ -1,4 +1,6 @@
 # app core modules
+from typing import final
+
 from modules.app.settings import Settings
 from cryptography.fernet import Fernet
 import random
@@ -7,8 +9,8 @@ class Crypt:
     def __init__( self, context ) -> None:
         self.context = context
         self.settings : Settings = context.settings
-        #self.test_encrypt()
-        #self.test_decrypt()
+        self.test_encrypt()
+        self.test_decrypt()
 
     def test_encrypt(self):
         keys = self.generate_key()
@@ -18,13 +20,14 @@ class Crypt:
                 f.write('\n')
         with open("Generated_keys.txt") as f:
             contents = f.readlines()
-        picked_keys = self.pick_keys()
+        picked_keys = self.pick_keys(contents)
         with open('Picked_keys.txt', 'w') as f:
             for line in picked_keys:
                 f.write(line)
         final_encrypted_txt = self.encrypt_txt()
         with open('Encrypted_text.txt', 'w') as f:
-            f.write(line)
+            f.write(final_encrypted_txt.decode())
+            print(final_encrypted_txt)
 
     def test_decrypt(self):
         decrypted_txt = self.decrypt_txt()
@@ -72,7 +75,7 @@ class Crypt:
     def decrypt_txt(self):
         key = self.read_password_file()
         f = Fernet(key)
-        print(f)
         encrypted_txt = self.read_encrypted_file()
-        decrypted_data = f.decrypt(encrypted_txt)
+        decrypted_data = f.decrypt(encrypted_txt.encode())
         return decrypted_data
+
