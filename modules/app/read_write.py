@@ -12,8 +12,8 @@ class ReadWrite:
         self.prevShareableFiles: int = 0
 
         self.dir = Path(self.settings.filesdir).resolve()
-        self.textDir = self.dir.joinpath("txt")
-        self.pdfDir = self.dir.joinpath("pdf")
+        self.textDir = self.dir.joinpath(self.settings.txt_subdir)
+        self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
 
     def getFiles(self, path: Path, count_only: bool = False) -> list:
         """Get all files in a certain directory."""
