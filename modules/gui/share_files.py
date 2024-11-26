@@ -148,6 +148,11 @@ class GUI_ShareFiles( GuiModule ):
         
         self.current_position.y += 25
 
+    def _debugClearFiles( self ) -> None:
+        """Debug function to clear all files 'txt' and 'pdf'"""
+        self.context.read_write.removeTextFiles()
+        self.context.read_write.removePdfFiles()
+
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
         lan_info.configure(font=("Helvetica", 14, "bold"))
@@ -181,7 +186,7 @@ class GUI_ShareFiles( GuiModule ):
         self.context.bg_worker_force_gui_update()
 
         button = Button( self, text = "Opnieuw Beginnen", 
-               command = lambda : self.context.read_write.removeTextFiles() )
+               command = lambda : self._debugClearFiles() )
         button.place( x = self.settings.appplication_width - 130, 
                       y = self.settings.appplication_height - 40 )
 

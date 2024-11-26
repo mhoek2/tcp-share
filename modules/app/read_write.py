@@ -11,6 +11,9 @@ class ReadWrite:
         self.numShareableFiles: int = 0
         self.prevShareableFiles: int = 0
 
+        self.numPDFFiles: int = 0
+        self.prevPDFFiles: int = 0
+
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
@@ -51,7 +54,9 @@ class ReadWrite:
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any text files."""
-        return bool(self.getFiles(self.pdfDir, True))
+        files = self.getFiles(self.pdfDir, True)
+        self.numPDFFiles = len(files)
+        return bool(files)
 
     def getPdfFiles(self) -> list:
         """Get all text files."""
