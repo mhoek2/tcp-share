@@ -12,17 +12,19 @@ class ReadWrite:
         self.prevShareableFiles: int = 0
 
         self.dir = Path(self.settings.filesdir).resolve()
-        self.textDir = self.dir.joinpath("txt")
-        self.pdfDir = self.dir.joinpath("pdf")
+        self.textDir = self.dir.joinpath(self.settings.txt_subdir)
+        self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
 
-    def getFiles(self, path: Path) -> list:
+    def getFiles(self, path: Path, count_only: bool = False) -> list:
         """Get all files in a certain directory."""
         files = []
 
         if any(path.glob("*")):
             for file in path.glob("*"):
                 if file.is_file():
-                    files.append({"filename": file.name, "contents": file.read_bytes()})
+                    # Do not read the file if count_only is true
+                    contents = None if count_only else file.read_bytes()
+                    files.append({"filename": file.name, "contents": contents})
 
         return files
 
@@ -34,7 +36,7 @@ class ReadWrite:
 
     def hasTextFiles(self) -> bool:
         """Check if there are any text files."""
-        files = self.getFiles(self.textDir)
+        files = self.getFiles(self.textDir, True)
         self.numShareableFiles = len(files)
         return bool(files)
 
@@ -49,7 +51,7 @@ class ReadWrite:
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any text files."""
-        return bool(self.getFiles(self.pdfDir))
+        return bool(self.getFiles(self.pdfDir, True))
 
     def getPdfFiles(self) -> list:
         """Get all text files."""
