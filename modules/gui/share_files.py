@@ -76,7 +76,7 @@ class GUI_ShareFiles( GuiModule ):
         print( f"Device {device['hostname']} on IP {device['ip']} online: {is_online} allowing: {is_allowing}" )
 
     def updateDevices( self ):
-        for device in self.LAN_devices:
+        for device in self.settings.LAN_devices:
             self.updateDevice( device )
 
     def drawDevice( self, device ):   
@@ -99,6 +99,10 @@ class GUI_ShareFiles( GuiModule ):
         device['gui']['status'].place( x = 300, y = 10 ) 
 
         self.current_position.y += 55
+
+    def drawDevices( self ):
+        for device in self.settings.LAN_devices:
+            self.drawDevice( device )
 
     def allowConnectionCheckboxCallback( self ):
         self.settings.allowConnection = self.allowCon.get()
@@ -152,12 +156,6 @@ class GUI_ShareFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
                     
-        self.LAN_devices = []
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-001', 'ip':'10.0.82.23', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-005', 'ip':'10.0.1.63', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-007', 'ip':'10.0.1.57', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-006', 'ip':'10.0.151.181', 'gui': {} } )
-
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
 
@@ -177,8 +175,7 @@ class GUI_ShareFiles( GuiModule ):
 
         self.current_position.y += 40
 
-        for device in self.LAN_devices:
-            self.drawDevice( device )
+        self.drawDevices()
 
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()
