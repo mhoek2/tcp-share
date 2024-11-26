@@ -1,16 +1,21 @@
 # app core modules
-from typing import final
-
+from modules.app.read_write import ReadWrite
 from modules.app.settings import Settings
 from cryptography.fernet import Fernet
 import random
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from main import Application
+
 class Crypt:
     def __init__( self, context ) -> None:
-        self.context = context
+        self.context: "Application" = context
         self.settings : Settings = context.settings
-        self.test_encrypt()
-        self.test_decrypt()
+        self.suffix = self.context.settings.file_encrypted_suffix
+        # self.test_encrypt()
+        # self.test_decrypt()
 
     def test_encrypt(self):
         keys = self.generate_key()
@@ -24,14 +29,10 @@ class Crypt:
         with open('Picked_keys.txt', 'w') as f:
             for line in picked_keys:
                 f.write(line)
-        final_encrypted_txt = self.encrypt_txt()
-        with open('Encrypted_text.txt', 'w') as f:
-            f.write(final_encrypted_txt.decode())
-            print(final_encrypted_txt)
+        self.encrypt_files()
 
     def test_decrypt(self):
-        decrypted_txt = self.decrypt_txt()
-        print(decrypted_txt)
+        self.decrypt_files()
 
     def generate_key(self):
         output_keys = []
@@ -58,24 +59,45 @@ class Crypt:
             contents = f.readlines()
         for line in contents:
             key_list.append(line)
-        return key_list[0]
+        return key_list[0] # TO-DO: make dynamic
 
     def read_encrypted_file(self):
         with open("Encrypted_text.txt") as f:
             encrypted_txt = f.read()
             return encrypted_txt
 
-    def encrypt_txt(self):
-        unencrypted_txt = self.read_txt()
+    def encrypt_files(self) -> None:
+        files = self.context.read_write.getTextFiles()
+
+        for file in files:
+            encrypted_contents = self.encrypt_txt(file)
+            
+            new_filename = file["filename"].replace(".txt", f"{self.suffix}.txt")
+            self.context.read_write.writeTextFile(new_filename, encrypted_contents.decode())
+
+    def encrypt_txt(self, file: ReadWrite.FilesDict) -> bytes:
+        unencrypted_txt = file['contents'].decode()
         password = self.read_password_file()
         f = Fernet(password)
         encrypted_txt = f.encrypt(unencrypted_txt.encode())
+        
         return encrypted_txt
+    
+    def decrypt_files(self) -> None:
+        files = self.context.read_write.getEncryptedTextFiles()
+        
+        for file in files:
+            decrypted_contents = self.decrypt_txt(file)
+            
+            new_filename = file["filename"].replace(self.suffix, "_decrypted")
+            print(new_filename)
+            self.context.read_write.writeTextFile(
+                new_filename, decrypted_contents.decode()
+            )
 
-    def decrypt_txt(self):
+    def decrypt_txt(self, file: ReadWrite.FilesDict) -> bytes:
         key = self.read_password_file()
         f = Fernet(key)
-        encrypted_txt = self.read_encrypted_file()
-        decrypted_data = f.decrypt(encrypted_txt.encode())
+        encrypted_txt = file["contents"]
+        decrypted_data = f.decrypt(encrypted_txt)
         return decrypted_data
-
