@@ -25,3 +25,5 @@ class Settings:
         self.server_ip = '127.0.0.1'
         self.tcp_port = 43431
         self.allowConnection = 1
+        self.bufsize_meta = 1024    # bytes for simple commands and handshakes
+        self.bufsize_payload = 4096 # bytes for larger transfers content like text or bytes

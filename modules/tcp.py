@@ -5,6 +5,7 @@ import socket
 import json
 import subprocess
 import platform
+import base64
 
 class TCP:
     def __init__( self, context ) -> None:
@@ -42,8 +43,7 @@ class TCP:
             print( f"Connection from: {addr[0]}:{addr[1]}" )
             c.send( b"Welcome client!" )
 
-            received = str(c.recv(1024), "utf-8") 
-
+            received = c.recv( self.settings.bufsize_payload ).decode('utf-8')
             rcv_data = json.loads( received )
 
             send_data = { }
@@ -56,7 +56,14 @@ class TCP:
                         print( f"received file: {file}" )
                         filename = file['filename']
                         content = file['contents']
-                        self.context.read_write.writeTextFile(filename, content)
+
+                        if file['is_bytes']:
+                            print("write bytes")
+                            content_bytes = base64.b64decode( content )
+                            self.context.read_write.writePdfFile( filename, content_bytes )
+                        else:
+                            self.context.read_write.writeTextFile( filename, content )
+
                         send_data = { 'success': 'File received successfully!' }
                     else:
                         print("Connections is refused!")
@@ -93,8 +100,9 @@ class TCP:
 
         try:
             s.connect( ( server[0], server[1] ) )
-
-            received = str( s.recv(1024), "utf-8" ) 
+ 
+            received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+ 
             print(received)
         except socket.timeout:
             self.client_disconnect( s )
@@ -131,18 +139,26 @@ class TCP:
         if s == False:
             return False 
 
+        is_bytes = False
+
+        if isinstance( content, bytes ):
+            is_bytes = True
+            content = base64.b64encode(content).decode('utf-8') 
+
         send_data = {
             'action' : 'store_file',
             'file': {
                     'filename': filename,
+                    'is_bytes': is_bytes,
                     'contents': content
                 }
             }
 
         s.sendall( bytes( json.dumps( send_data ) + "\n", "utf-8" ) ) # Send data
         
-        rcv_data = json.loads( str( s.recv(1024), "utf-8" ) )
-        
+        received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+        rcv_data = json.loads( received )
+
         if 'success' in rcv_data:
             print( rcv_data['success'] )
 
@@ -173,11 +189,12 @@ class TCP:
 
        s.sendall( bytes( json.dumps( { 'action' : parameter } ) + "\n", "utf-8" ) ) # Send data
        
-       received = json.loads( str( s.recv(1024), "utf-8" ) )
+       received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
+       rcv_data = json.loads( received )
 
        self.client_disconnect( s )
 
-       return bool( received['value'] ) if 'value' in received else False
+       return bool( rcv_data['value'] ) if 'value' in rcv_data else False
 
     def get_allow_receive( self, server ):
         """Connect to a socket stream and request a boolean state, then close the stream

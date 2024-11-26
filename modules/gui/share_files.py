@@ -29,6 +29,7 @@ class GUI_ShareFiles( GuiModule ):
     def sendChoiceModalCallback( self, server, modal, choice ):
         if choice == "PDF":
             print( f"Create and send pdf! {server}")
+            self.send_pdf_file( server )
         else:
             print( f"Send txt! {server}")
             self.send_txt_files( server )
@@ -45,12 +46,12 @@ class GUI_ShareFiles( GuiModule ):
             self.context.tcp.client_send_file( server, file['filename'], file['contents'].decode() )
 
     def send_pdf_file( self, server ):
-        #files = self.context.read_write.getShareablePDFFiles()
+        files = self.context.read_write.getPdfFiles()
         
         print(f"Attempt to share PDF files to: {server}")
 
-        #for file in files:
-        #    self.context.tcp.client_send_file( server, file['filename'], file['contents'] )
+        for file in files:
+            self.context.tcp.client_send_file( server, file['filename'], file['contents'] )
 
     def updateDevice( self, device ):
         is_online = True if self.context.tcp.ping_device( device['ip'] ) else False
