@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import TypedDict
 
 from modules.app.settings import Settings
 
@@ -15,15 +16,19 @@ class ReadWrite:
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
 
+    class FilesDict(TypedDict):
+        filename: str
+        contents: bytes
+
     def getFiles(self, path: Path, count_only: bool = False) -> list:
         """Get all files in a certain directory."""
-        files = []
+        files: list[ReadWrite.FilesDict] = []
 
         if any(path.glob("*")):
             for file in path.glob("*"):
                 if file.is_file():
                     # Do not read the file if count_only is true
-                    contents = None if count_only else file.read_bytes()
+                    contents = "".encode() if count_only else file.read_bytes()
                     files.append({"filename": file.name, "contents": contents})
 
         return files
@@ -42,7 +47,17 @@ class ReadWrite:
 
     def getTextFiles(self) -> list:
         """Get all text files."""
-        return self.getFiles(self.textDir)
+        files = self.getFiles(self.textDir)
+
+        suffix = self.settings.file_encrypted_suffix
+        return list(filter(lambda item: suffix not in item["filename"], files))
+
+    def getEncryptedTextFiles(self) -> list:
+        """Get all encrypted text files."""
+        files = self.getFiles(self.textDir)
+
+        suffix = self.settings.file_encrypted_suffix
+        return list(filter(lambda item: suffix in item["filename"], files))
 
     def removeTextFiles(self) -> None:
         """Remove all text files."""
