@@ -19,12 +19,15 @@ class GUI_ShareFiles( GuiModule ):
         modal.grab_set()
 
         Label(modal, text=f"Tekstbestanden of PDF's versturen naar \n {server[0]}:{server[1]}?").pack( pady=10 )
-    
-        Button( modal, text="Tekst", command=lambda: 
+
+        button_state = NORMAL if self.context.read_write.hasTextFiles() else DISABLED
+        Button( modal, text="Tekst", state=button_state, command=lambda: 
                self.sendChoiceModalCallback( server, modal, "Tekst" ) ).pack( side=LEFT, padx=20, pady=20 )
 
-        Button( modal, text="PDF", command=lambda: 
-               self.sendChoiceModalCallback( server, modal, "PDF" ) ).pack( side=RIGHT, padx=20, pady=20 )
+
+        button_state = NORMAL if self.context.read_write.hasPdfFiles() else DISABLED
+        Button( modal, text="PDF", state=button_state, 
+               command=lambda: self.sendChoiceModalCallback( server, modal, "PDF" ) ).pack( side=RIGHT, padx=20, pady=20 )
 
     def sendChoiceModalCallback( self, server, modal, choice ):
         if choice == "PDF":
