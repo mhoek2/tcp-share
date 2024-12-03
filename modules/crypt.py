@@ -22,7 +22,7 @@ class Crypt:
         # self.test_encrypt()
         # self.test_decrypt()
 
-    def test_encrypt(self):
+    def test_encrypt(self) -> None:
         # 1. Generate the keys for encryption
         keys = self.generate_keys()
         # 2. Write the keys to a file
@@ -41,17 +41,17 @@ class Crypt:
         # 7. Encrypt all text files.
         self.encrypt_files()
 
-    def test_decrypt(self):
+    def test_decrypt(self) -> None:
         self.decrypt_files()
 
-    def generate_keys(self):
+    def generate_keys(self) -> list:
         output_keys = []
         for i in range(0, self.settings.num_salts):
             key = Fernet.generate_key()
             output_keys.append(key.decode())
         return output_keys
 
-    def pick_keys(self, contents, amount: int):
+    def pick_keys(self, contents, amount: int) -> list:
         output_picked_keys = []
         for i in range(0, amount):
             choice = random.choice(contents)
@@ -63,7 +63,7 @@ class Crypt:
     #         fake_file = f.read()
     #         return fake_file
 
-    def read_password_file(self, i: int):
+    def read_password_file(self, i: int) -> str:
         key_list = []
         # with open("Picked_keys.txt") as f:
         #     contents = f.readlines()
@@ -72,10 +72,10 @@ class Crypt:
             key_list.append(line)
         return key_list[i]
 
-    def read_encrypted_file(self):
-        with open("Encrypted_text.txt") as f:
-            encrypted_txt = f.read()
-            return encrypted_txt
+    # def read_encrypted_file(self):
+    #     with open("Encrypted_text.txt") as f:
+    #         encrypted_txt = f.read()
+    #         return encrypted_txt
 
     def encrypt_files(self) -> None:
         files = self.context.read_write.getTextFiles()
