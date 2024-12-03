@@ -1,6 +1,11 @@
-# Files created by the application
+# Folders and files created by the application
 files/*
+
+# Folders and files formerly created by the application
 pdf_files/*
+Generated_keys.txt
+Keys_test.txt
+Picked_keys.txt
 
 ################################################################################
 
