@@ -17,6 +17,8 @@ class ReadWrite:
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
 
+        self.suffix = self.settings.file_encrypted_suffix
+
     class FilesDict(TypedDict):
         filename: str
         contents: bytes
@@ -42,9 +44,27 @@ class ReadWrite:
 
     def hasTextFiles(self) -> bool:
         """Check if there are any text files."""
-        files = self.getFiles(self.textDir, True)
+        files = [
+            item
+            for item in self.getFiles(self.textDir, True)
+            if not any(
+                keyword in item["filename"]
+                for keyword in [self.suffix, self.settings.password_file, "_decrypted"]
+            )
+        ]
+
         self.numShareableFiles = len(files)
         return bool(files)
+
+    def hasEncryptedTextFiles(self) -> bool:
+        """Checks if there are any encrypted text files."""
+        return bool(
+            [
+                item
+                for item in self.getFiles(self.textDir)
+                if self.suffix in item["filename"]
+            ]
+        )
 
     def hasPasswordsFile(self) -> bool:
         """Check whether the passwords file exists."""
@@ -57,25 +77,25 @@ class ReadWrite:
         return bool(self.getFiles(self.pdfDir, True))
 
     def getTextFiles(self) -> list:
-        """Get all text files."""
-        files = self.getFiles(self.textDir)
-
-        suffix = self.settings.file_encrypted_suffix
+        """
+        Get all text files (except for encrypted files and the passwords file).
+        """
         return [
             item
-            for item in files
+            for item in self.getFiles(self.textDir)
             if not any(
                 keyword in item["filename"]
-                for keyword in [suffix, self.settings.password_file, "_decrypted"]
+                for keyword in [self.suffix, self.settings.password_file, "_decrypted"]
             )
         ]
 
     def getEncryptedTextFiles(self) -> list:
         """Get all encrypted text files."""
-        files = self.getFiles(self.textDir)
-
-        suffix = self.settings.file_encrypted_suffix
-        return [item for item in files if suffix in item["filename"]]
+        return [
+            item
+            for item in self.getFiles(self.textDir)
+            if self.suffix in item["filename"]
+        ]
 
     def getPasswordsFile(self) -> list:
         """Get the contents of the password file."""
