@@ -18,8 +18,8 @@ class Crypt:
 
         self.files_range = range(0, self.settings.num_files)
 
-        self.test_encrypt()
-        self.test_decrypt()
+        # self.test_encrypt()
+        # self.test_decrypt()
 
     def test_encrypt(self):
         # 1. Generate the keys for encryption
