@@ -1,10 +1,11 @@
+import random
+from typing import TYPE_CHECKING
+
+from cryptography.fernet import Fernet
+
 # app core modules
 from modules.app.read_write import ReadWrite
 from modules.app.settings import Settings
-from cryptography.fernet import Fernet
-import random
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from main import Application
