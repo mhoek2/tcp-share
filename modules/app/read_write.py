@@ -23,7 +23,7 @@ class ReadWrite:
         filename: str
         contents: bytes
 
-    def getFiles(self, path: Path, count_only: bool = False) -> list:
+    def getFiles(self, path: Path, count_only: bool = False) -> list[FilesDict]:
         """Get all files in a certain directory."""
         files: list[ReadWrite.FilesDict] = []
 
@@ -41,9 +41,16 @@ class ReadWrite:
                     files.append({"filename": file.name, "contents": contents})
 
         return files
+    
+    def hasAnyTextFiles(self) -> bool:
+        """Check whether there are any text files, regardless of the type."""
+        files = self.getFiles(self.textDir, True)
+        
+        self.numShareableFiles = len(files) # decide whether to leave it here …
+        return bool(files)
 
     def hasTextFiles(self) -> bool:
-        """Check if there are any text files."""
+        """Check if there are any unencrypted text files."""
         files = [
             item
             for item in self.getFiles(self.textDir, True)
@@ -53,7 +60,7 @@ class ReadWrite:
             )
         ]
 
-        self.numShareableFiles = len(files)
+        self.numShareableFiles = len(files) # … or here
         return bool(files)
 
     def hasEncryptedTextFiles(self) -> bool:
@@ -73,13 +80,15 @@ class ReadWrite:
         return file.exists() and file.is_file and file.stat().st_size > 0
 
     def hasPdfFiles(self) -> bool:
-        """Check if there are any text files."""
+        """Check if there are any PDF files."""
         return bool(self.getFiles(self.pdfDir, True))
+    
+    def getAllTextFiles(self) -> list[FilesDict]:
+        """Return all text files, making no distinction between the types of files"""
+        return self.getFiles(self.textDir)
 
-    def getTextFiles(self) -> list:
-        """
-        Get all text files (except for encrypted files and the passwords file).
-        """
+    def getTextFiles(self) -> list[FilesDict]:
+        """Get all unencrypted text files."""
         return [
             item
             for item in self.getFiles(self.textDir)
@@ -89,7 +98,7 @@ class ReadWrite:
             )
         ]
 
-    def getEncryptedTextFiles(self) -> list:
+    def getEncryptedTextFiles(self) -> list[FilesDict]:
         """Get all encrypted text files."""
         return [
             item
@@ -103,8 +112,8 @@ class ReadWrite:
 
         return json.loads(file_path.read_text())
 
-    def getPdfFiles(self) -> list:
-        """Get all text files."""
+    def getPdfFiles(self) -> list[FilesDict]:
+        """Get all PDF files."""
         return self.getFiles(self.pdfDir)
 
     def writeFile(self, path: Path, contents: str) -> None:
