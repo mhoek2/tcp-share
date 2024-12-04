@@ -78,12 +78,13 @@ class Gui( tk.Tk ):
         frame.tkraise()
         self.current_frame = index
 
-    def decide_main_frame( self ) -> int:
-        """Decide wheter to show 'create' or 'share' files GUI page
-        - Need to revisit this method once more frames/pages are added"""
+    def get_frame_index_for_file_sharing( self ) -> int:
+        """Return the index of 'create_files' or 'share_files' frame/page
+        based on the presence of files"""
 
         index : int = 0
-        if self.context.read_write.hasTextFiles():
+
+        if self.context.has_files():
             index = self.FRAME_SHARE_FILES
         else:
             index = self.FRAME_CREATE_FILES
@@ -91,6 +92,7 @@ class Gui( tk.Tk ):
         return index
 
     def goHome( self ):
+        """Determine whether to display the 'create_files' or 'share_files' frame/page."""
         reload_frame : bool = True # redundant bool ..
-        self.show_frame( self.decide_main_frame(), reload_frame )
+        self.show_frame( self.get_frame_index_for_file_sharing(), reload_frame )
         return

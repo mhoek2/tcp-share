@@ -10,23 +10,28 @@ from tkinter.font import BOLD
 import subprocess
 from pathlib import Path
 
+from modules.tcp import TCP
+
 class GUI_ShareFiles( GuiModule ):
 
-    def openSendChoiceModal( self, server ):
+    def openSendChoiceModal( self, server : TCP.Server_t ) -> None:
         # Create a new Toplevel window (modal)
         modal = Toplevel( self.gui )
         modal.title( f"Keuze" )
         modal.grab_set()
 
-        Label(modal, text=f"Tekstbestanden of PDF's versturen naar \n {server[0]}:{server[1]}?").pack( pady=10 )
-    
-        Button( modal, text="Tekst", command=lambda: 
+        Label(modal, text=f"Tekstbestanden of PDF's versturen naar \n {server['ip']}:{server['port']}?").pack( pady=10 )
+
+        button_state = NORMAL if self.context.read_write.hasTextFiles() else DISABLED
+        Button( modal, text="Tekst", state=button_state, command=lambda: 
                self.sendChoiceModalCallback( server, modal, "Tekst" ) ).pack( side=LEFT, padx=20, pady=20 )
 
-        Button( modal, text="PDF", command=lambda: 
-               self.sendChoiceModalCallback( server, modal, "PDF" ) ).pack( side=RIGHT, padx=20, pady=20 )
 
-    def sendChoiceModalCallback( self, server, modal, choice ):
+        button_state = NORMAL if self.context.read_write.hasPdfFiles() else DISABLED
+        Button( modal, text="PDF", state=button_state, 
+               command=lambda: self.sendChoiceModalCallback( server, modal, "PDF" ) ).pack( side=RIGHT, padx=20, pady=20 )
+
+    def sendChoiceModalCallback( self, server : TCP.Server_t, modal, choice ):
         if choice == "PDF":
             print( f"Create and send pdf! {server}")
             self.send_pdf_file( server )
@@ -36,7 +41,7 @@ class GUI_ShareFiles( GuiModule ):
 
         modal.destroy()
 
-    def send_txt_files( self, server ):
+    def send_txt_files( self, server : TCP.Server_t ):
         files = self.context.read_write.getTextFiles()
         
         print(f"Attempt to share files to: {server}")
@@ -45,7 +50,7 @@ class GUI_ShareFiles( GuiModule ):
         for file in files:
             self.context.tcp.client_send_file( server, file['filename'], file['contents'].decode() )
 
-    def send_pdf_file( self, server ):
+    def send_pdf_file( self, server : TCP.Server_t ):
         files = self.context.read_write.getPdfFiles()
         
         print(f"Attempt to share PDF files to: {server}")
@@ -60,7 +65,8 @@ class GUI_ShareFiles( GuiModule ):
         device['gui']['send'].config( state=DISABLED )
 
         if is_online:
-            is_allowing = self.context.tcp.get_allow_receive( (device['ip'], self.settings.tcp_port) ) 
+            server : TCP.Server_t = { 'ip' : device['ip'], 'port' : self.settings.tcp_port }
+            is_allowing = self.context.tcp.get_allow_receive( server ) 
 
             if is_allowing:
                 device['gui']['status'].config( text="Ready")
@@ -76,7 +82,7 @@ class GUI_ShareFiles( GuiModule ):
         print( f"Device {device['hostname']} on IP {device['ip']} online: {is_online} allowing: {is_allowing}" )
 
     def updateDevices( self ):
-        for device in self.LAN_devices:
+        for device in self.settings.LAN_devices:
             self.updateDevice( device )
 
     def drawDevice( self, device ):   
@@ -91,14 +97,21 @@ class GUI_ShareFiles( GuiModule ):
         device['gui']['status_indicator'].place( x=-0, y=-0, width=3, heigh =45 ) 
 
         pos_x = 10
+
+        server : TCP.Server_t = { 'ip': device['ip'], 'port': self.settings.tcp_port }
+
         device['gui']['send'] = Button( frame, text = device['hostname'], state=DISABLED,
-                command = lambda param=( device['ip'], self.settings.tcp_port ): self.openSendChoiceModal(param) )
+                command = lambda param=server: self.openSendChoiceModal(param) )
         device['gui']['send'].place( y=10, x=pos_x )
 
         device['gui']['status'] = Label( frame, text=f"-")
         device['gui']['status'].place( x = 300, y = 10 ) 
 
         self.current_position.y += 55
+
+    def drawDevices( self ):
+        for device in self.settings.LAN_devices:
+            self.drawDevice( device )
 
     def allowConnectionCheckboxCallback( self ):
         self.settings.allowConnection = self.allowCon.get()
@@ -144,6 +157,11 @@ class GUI_ShareFiles( GuiModule ):
         
         self.current_position.y += 25
 
+    def _debugClearFiles( self ) -> None:
+        """Debug function to clear all files 'txt' and 'pdf'"""
+        self.context.read_write.removeTextFiles()
+        self.context.read_write.removePdfFiles()
+
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
         lan_info.configure(font=("Helvetica", 14, "bold"))
@@ -152,12 +170,6 @@ class GUI_ShareFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
                     
-        self.LAN_devices = []
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-001', 'ip':'10.0.82.23', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-005', 'ip':'10.0.1.63', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-007', 'ip':'10.0.1.57', 'gui': {} } )
-        self.LAN_devices.append( { 'hostname':'RGD-ITA-006', 'ip':'10.0.151.181', 'gui': {} } )
-
         self.device_frame = {}
         self.current_position = Vector2( 0, 50 )
 
@@ -177,14 +189,13 @@ class GUI_ShareFiles( GuiModule ):
 
         self.current_position.y += 40
 
-        for device in self.LAN_devices:
-            self.drawDevice( device )
+        self.drawDevices()
 
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()
 
         button = Button( self, text = "Opnieuw Beginnen", 
-               command = lambda : self.context.read_write.removeTextFiles() )
+               command = lambda : self._debugClearFiles() )
         button.place( x = self.settings.appplication_width - 130, 
                       y = self.settings.appplication_height - 40 )
 
