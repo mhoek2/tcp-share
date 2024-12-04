@@ -44,12 +44,12 @@ class ReadWrite:
                     files.append({"filename": file.name, "contents": contents})
 
         return files
-    
+
     def hasAnyTextFiles(self) -> bool:
         """Check whether there are any text files, regardless of the type."""
         files = self.getFiles(self.textDir, True)
-        
-        self.numShareableFiles = len(files) # decide whether to leave it here …
+
+        self.numShareableFiles = len(files)  # decide whether to leave it here …
         return bool(files)
 
     def hasTextFiles(self) -> bool:
@@ -63,7 +63,7 @@ class ReadWrite:
             )
         ]
 
-        self.numShareableFiles = len(files) # … or here
+        self.numShareableFiles = len(files)  # … or here
         return bool(files)
 
     def hasEncryptedTextFiles(self) -> bool:
@@ -87,7 +87,7 @@ class ReadWrite:
         files = self.getFiles(self.pdfDir, True)
         self.numPDFFiles = len(files)
         return bool(files)
-    
+
     def getAllTextFiles(self) -> list[FilesDict]:
         """Return all text files, making no distinction between the types of files"""
         return self.getFiles(self.textDir)
@@ -159,7 +159,7 @@ class ReadWrite:
         Remove all text files (including encrypted files, decrypted
         files and the passwords file).
         """
-        if self.hasTextFiles:
+        if self.hasAnyTextFiles:
             self.removeFiles(self.textDir)
 
     def removePdfFiles(self) -> None:
