@@ -175,21 +175,36 @@ class GUI_ShareFiles( GuiModule ):
 
         self.drawBrowseButtons()
 
+        self.current_position.y += 40
+
+        # visualize enctryption state
+        is_encrypted = self.context.read_write.hasPasswordsFile()
+        file_state_states_text = [ "Onversleuteld", "Versleuteld" ][is_encrypted]
+        file_state_states_bg = [ "#f9c0a2", "#a2f9b2" ][is_encrypted]
+
+        frame_width = 100
+        x_pos = (self.settings.appplication_width / 2) - (frame_width / 2)
+        file_state_frame = Frame( self, bg=file_state_states_bg, padx=0, pady=0 )
+        file_state_frame.place( x=x_pos, y=self.current_position.y, width=frame_width, height=45 ) 
+        file_state_text = Label( file_state_frame, text=f"{file_state_states_text}", bg=file_state_states_bg )
+        file_state_text.place( x = (10 + (is_encrypted * 8)), y = 12 )
+
+        self.current_position.y += 60
+
         self.allowCon = IntVar( value=self.settings.allowConnection )
         c1 = Checkbutton( self, text='Verbindingen Toestaan',variable=self.allowCon, onvalue=1, offvalue=0, 
                         command=lambda : self.allowConnectionCheckboxCallback() )
         c1.place( x = 15, y =  self.current_position.y )
 
-        self.current_position.y += 25
+        self.current_position.y += 30
+
+        # draw LAN devices
+        self.drawDevices()
 
         # force LAN device status refresh
-        refresh = Button( self, text = "Refresh", 
+        refresh = Button( self, text = "Lijst vernieuwen", 
                command = lambda : self.context.bg_worker_force_gui_update() )
-        refresh.place( x = 30, y = self.current_position.y )
-
-        self.current_position.y += 40
-
-        self.drawDevices()
+        refresh.place( x = 20, y = self.current_position.y )
 
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()

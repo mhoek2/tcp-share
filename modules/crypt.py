@@ -9,29 +9,58 @@ class Crypt:
     def __init__( self, context ) -> None:
         self.context = context
         self.settings : Settings = context.settings
-        self.test_encrypt()
-        self.test_decrypt()
+        
+        self.password_file = self.context.read_write.textDir.joinpath( self.settings.password_file )
+       
+        #self.encrypt_files()
+        #self.decrypt_files()
 
-    def test_encrypt(self):
+
+    def encrypt_files(self):
+        files = self.context.read_write.getTextFiles()
+
+        # create passwords
         keys = self.generate_key()
-        with open('Generated_keys.txt', 'w') as f:
+        with open( self.password_file, 'w') as f:
             for line in keys:
                 f.write(line)
                 f.write('\n')
-        with open("Generated_keys.txt") as f:
+
+        # read passwords
+        with open(self.password_file) as f:
             contents = f.readlines()
+
+        # pick keys and write
         picked_keys = self.pick_keys(contents)
-        with open('Picked_keys.txt', 'w') as f:
+        with open(self.password_file, 'w') as f:
             for line in picked_keys:
                 f.write(line)
-        final_encrypted_txt = self.encrypt_txt()
-        with open('Encrypted_text.txt', 'w') as f:
-            f.write(final_encrypted_txt.decode())
-            print(final_encrypted_txt)
+  
+        for i, file in enumerate( files ):
+            if self.context.read_write.isPasswordFile(file) == True:
+                i -= 1
+                continue
 
-    def test_decrypt(self):
-        decrypted_txt = self.decrypt_txt()
-        print(decrypted_txt)
+            data = self.encrypt_txt( i, file )
+
+            filepath = self.context.read_write.textDir.joinpath( file['filename'] )
+            with open( filepath, 'w') as f:
+                f.write( data.decode() )
+
+    def decrypt_files(self):
+        files = self.context.read_write.getTextFiles()
+
+        for i, file in enumerate( files ):
+            if self.context.read_write.isPasswordFile(file) == True:
+                i -= 1
+                continue
+
+            decrypted_txt = self.decrypt_txt( file, i )
+           
+            filepath = self.context.read_write.textDir.joinpath( file['filename'] )
+            with open( filepath, 'w') as f:
+                f.write( decrypted_txt.decode() )
+
 
     def generate_key(self):
         output_keys = []
@@ -47,35 +76,31 @@ class Crypt:
             output_picked_keys.append(choice)
         return output_picked_keys
 
-    def read_txt(self):
-        with open("fake_Nick_file.txt") as f:
-            fake_file = f.read()
-            return fake_file
-
-    def read_password_file(self):
+    def read_password_file( self, index ):
         key_list = []
-        with open("Picked_keys.txt") as f:
+        with open(self.password_file) as f:
             contents = f.readlines()
         for line in contents:
             key_list.append(line)
-        return key_list[0]
+        return key_list[index]
 
-    def read_encrypted_file(self):
-        with open("Encrypted_text.txt") as f:
+    def read_encrypted_file( self, file ):
+        filepath = self.context.read_write.textDir.joinpath( file['filename'] )
+        with open(filepath) as f:
             encrypted_txt = f.read()
             return encrypted_txt
 
-    def encrypt_txt(self):
-        unencrypted_txt = self.read_txt()
-        password = self.read_password_file()
+    def encrypt_txt(self, index, file):
+        unencrypted_txt = file['contents'].decode()
+        password = self.read_password_file( index )
         f = Fernet(password)
         encrypted_txt = f.encrypt(unencrypted_txt.encode())
         return encrypted_txt
 
-    def decrypt_txt(self):
-        key = self.read_password_file()
+    def decrypt_txt(self, file, index ):
+        key = self.read_password_file( index )
         f = Fernet(key)
-        encrypted_txt = self.read_encrypted_file()
+        encrypted_txt = self.read_encrypted_file( file )
         decrypted_data = f.decrypt(encrypted_txt.encode())
         return decrypted_data
 

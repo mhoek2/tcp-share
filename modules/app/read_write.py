@@ -17,6 +17,8 @@ class ReadWrite:
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
+       
+        self.password_file = self.textDir.joinpath( self.settings.password_file )
 
     def getFiles(self, path: Path, count_only: bool = False) -> list:
         """Get all files in a certain directory."""
@@ -51,6 +53,21 @@ class ReadWrite:
         """Remove all text files."""
         if self.hasTextFiles:
             self.removeFiles(self.textDir)
+
+    def hasPasswordsFile(self) -> bool:
+        """Check whether the passwords file exists."""
+        file = self.password_file
+
+        return file.exists() and file.is_file and file.stat().st_size > 0
+    
+    def isPasswordFile( self, file ):
+        if file['filename'] == self.settings.password_file:
+            return True
+        return False
+
+    def removePasswordFile( self ) -> None:
+        if self.password_file.is_file():
+            self.password_file.unlink()
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any text files."""
