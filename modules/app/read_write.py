@@ -40,7 +40,7 @@ class ReadWrite:
 
     def hasTextFiles(self) -> bool:
         """Check if there are any text files."""
-        files = self.getFiles(self.textDir, True)
+        files = self.getTextFiles()
         self.numShareableFiles = len(files)
         return bool(files)
 
@@ -61,10 +61,9 @@ class ReadWrite:
         """Get all text files."""
         return self.getFiles(self.textDir)
 
-    def removeTextFiles(self) -> None:
+    def removeTransferFiles(self) -> None:
         """Remove all text files."""
-        if self.hasTextFiles:
-            self.removeFiles(self.textDir)
+        self.removeFiles(self.textDir)
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any text files."""
