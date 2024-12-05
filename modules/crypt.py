@@ -9,8 +9,8 @@ class Crypt:
     def __init__( self, context ) -> None:
         self.context = context
         self.settings : Settings = context.settings
-        self.test_encrypt()
-        self.test_decrypt()
+        #self.test_encrypt()
+        #self.test_decrypt()
 
     def test_encrypt(self):
         keys = self.generate_key()
