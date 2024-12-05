@@ -50,7 +50,6 @@ class ReadWrite:
         """Check whether there are any text files, regardless of the type."""
         files = self.getFiles(self.textDir, True)
 
-        self.numShareableFiles = len(files)  # decide whether to leave it here …
         return bool(files)
 
     def hasTextFiles(self) -> bool:
@@ -64,7 +63,7 @@ class ReadWrite:
             )
         ]
 
-        self.numShareableFiles = len(files)  # … or here
+        self.numShareableFiles = len(files)
         return bool(files)
 
     def hasEncryptedTextFiles(self) -> bool:
