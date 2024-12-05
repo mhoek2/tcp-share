@@ -56,6 +56,7 @@ class Crypt:
         for i in range(0, amount):
             choice = random.choice(contents)
             output_picked_keys.append(choice)
+            contents.remove(choice)
         return output_picked_keys
 
     # def read_txt(self):
