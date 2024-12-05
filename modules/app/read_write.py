@@ -58,9 +58,9 @@ class ReadWrite:
         files = [
             item
             for item in self.getFiles(self.textDir, True)
-            if not any(
-                keyword in item["filename"]
-                for keyword in [self.suffix, self.settings.password_file, "_decrypted"]
+            if item["filename"].endswith(".txt")
+            and not any(
+                keyword in item["filename"] for keyword in [self.suffix, "_decrypted"]
             )
         ]
 
@@ -72,7 +72,7 @@ class ReadWrite:
         return bool(
             [
                 item
-                for item in self.getFiles(self.textDir)
+                for item in self.getFiles(self.textDir, True)
                 if self.suffix in item["filename"]
             ]
         )
@@ -90,7 +90,7 @@ class ReadWrite:
         return bool(files)
 
     def getAllTextFiles(self) -> list[FilesDict]:
-        """Return all text files, making no distinction between the types of files"""
+        """Return all text files, making no distinction between the types of files."""
         return self.getFiles(self.textDir)
 
     def getTextFiles(self) -> list[FilesDict]:
@@ -98,7 +98,10 @@ class ReadWrite:
         return [
             item
             for item in self.getFiles(self.textDir)
-            if not any(keyword in item["filename"] for keyword in self.exceptions)
+            if item["filename"].endswith(".txt")
+            and not any(
+                keyword in item["filename"] for keyword in [self.suffix, "_decrypted"]
+            )
         ]
 
     def getEncryptedTextFiles(self) -> list[FilesDict]:
@@ -109,7 +112,7 @@ class ReadWrite:
             if self.suffix in item["filename"]
         ]
 
-    def getPasswordsFile(self) -> list:
+    def getPasswordsFile(self) -> list[str]:
         """Get the contents of the password file."""
         file_path = self.textDir.joinpath(self.settings.password_file)
 
@@ -132,7 +135,7 @@ class ReadWrite:
         file_path = self.textDir.joinpath(file_name)
         self.writeFile(file_path, contents)
 
-    def writePasswordsFile(self, contents: list) -> None:
+    def writePasswordsFile(self, contents: list[str]) -> None:
         """Write to a passwords file."""
         file_path = self.textDir.joinpath(self.settings.password_file)
         self.writeFile(file_path, json.dumps(contents))
