@@ -61,10 +61,9 @@ class ReadWrite:
         """Get all text files."""
         return self.getFiles(self.textDir)
 
-    def removeTextFiles(self) -> None:
+    def removeTransferFiles(self) -> None:
         """Remove all text files."""
-        if self.hasTextFiles:
-            self.removeFiles(self.textDir)
+        self.removeFiles(self.textDir)
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any text files."""
