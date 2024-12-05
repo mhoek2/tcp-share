@@ -36,11 +36,15 @@ class GUI_ViewFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
 
+        language = self.context.translate.getCurrentLanguage()
+        lang = Label( self, text=f"Taal: {language['name']}")
+        lang.pack()
+
         self.crypt_button_text = [ "Encrypt", "Decrypt" ]
         self.crypt_button_frame = [ self.gui.FRAME_ENCRYPT_FILES, self.gui.FRAME_DECRYPT_FILES ]
         self.is_encrypted = False
 
-        self.current_position = Vector2( 0, 50 )
+        self.current_position = Vector2( 0, 80 )
 
         # frame
         frame = Frame( self )
@@ -78,6 +82,12 @@ class GUI_ViewFiles( GuiModule ):
         crypt = Button( self, text = self.crypt_button_text[self.is_encrypted], 
                command = lambda : self.encryptOrDecryptFiles( self.is_encrypted ) )
         crypt.place( x = self.settings.appplication_width - 70, 
+                      y = self.settings.appplication_height - 40 )
+
+        # translate button
+        refresh = Button( self, text = "Translate", 
+               command = lambda : self.context.translate.openTranslateModal() )
+        refresh.place( x = self.settings.appplication_width - 270, 
                       y = self.settings.appplication_height - 40 )
 
         back = Button( self, text = "Terug", 
