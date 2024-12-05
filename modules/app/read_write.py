@@ -21,6 +21,7 @@ class ReadWrite:
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
 
         self.suffix = self.settings.file_encrypted_suffix
+        self.exceptions = [self.suffix, self.settings.password_file, "_decrypted"]
 
     class FilesDict(TypedDict):
         filename: str
@@ -97,10 +98,7 @@ class ReadWrite:
         return [
             item
             for item in self.getFiles(self.textDir)
-            if not any(
-                keyword in item["filename"]
-                for keyword in [self.suffix, self.settings.password_file, "_decrypted"]
-            )
+            if not any(keyword in item["filename"] for keyword in self.exceptions)
         ]
 
     def getEncryptedTextFiles(self) -> list[FilesDict]:
@@ -161,6 +159,14 @@ class ReadWrite:
         """
         if self.hasAnyTextFiles:
             self.removeFiles(self.textDir)
+
+    def removeUnencryptedTextFiles(self) -> None:
+        """Remove only unencrypted text files."""
+        if self.hasTextFiles():
+            for file in self.textDir.glob("*"):
+                if file.is_file():
+                    if not any(keyword in file.name for keyword in self.exceptions):
+                        file.unlink()
 
     def removePdfFiles(self) -> None:
         """Remove all pdf files."""
