@@ -23,11 +23,6 @@ class GUI_ViewFiles( GuiModule ):
         reload_frame : bool = True # redundant bool ..
         self.gui.show_frame( self.crypt_button_frame[state], reload_frame )
 
-    def hasPasswordFile( self, file ):
-        if file['filename'] == self.settings.password_file:
-            self.is_encrypted = True
-
-
     def on_frame_configure(self, event):
         # Update the scrollregion of the canvas whenever the content frame's size changes
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -42,7 +37,7 @@ class GUI_ViewFiles( GuiModule ):
 
         self.crypt_button_text = [ "Encrypt", "Decrypt" ]
         self.crypt_button_frame = [ self.gui.FRAME_ENCRYPT_FILES, self.gui.FRAME_DECRYPT_FILES ]
-        self.is_encrypted = False
+        is_encrypted = self.context.read_write.hasPasswordsFile()
 
         self.current_position = Vector2( 0, 80 )
 
@@ -67,8 +62,6 @@ class GUI_ViewFiles( GuiModule ):
         # content
         self.files = self.context.read_write.getTextFiles()
         for file in self.files:
-            self.hasPasswordFile( file )
-
             file['gui'] = {}
             self.drawFile( file, content_frame )
 
@@ -79,8 +72,8 @@ class GUI_ViewFiles( GuiModule ):
         content_frame.bind( "<Configure>", self.on_frame_configure )
 
         # footer buttons
-        crypt = Button( self, text = self.crypt_button_text[self.is_encrypted], 
-               command = lambda : self.encryptOrDecryptFiles( self.is_encrypted ) )
+        crypt = Button( self, text = self.crypt_button_text[is_encrypted], 
+               command = lambda : self.encryptOrDecryptFiles( is_encrypted ) )
         crypt.place( x = self.settings.appplication_width - 70, 
                       y = self.settings.appplication_height - 40 )
 

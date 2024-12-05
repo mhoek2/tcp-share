@@ -37,10 +37,6 @@ class Crypt:
                 f.write(line)
   
         for i, file in enumerate( files ):
-            if self.context.read_write.isPasswordFile(file) == True:
-                i -= 1
-                continue
-
             data = self.encrypt_txt( i, file )
 
             filepath = self.context.read_write.textDir.joinpath( file['filename'] )
@@ -51,10 +47,6 @@ class Crypt:
         files = self.context.read_write.getTextFiles()
 
         for i, file in enumerate( files ):
-            if self.context.read_write.isPasswordFile(file) == True:
-                i -= 1
-                continue
-
             decrypted_txt = self.decrypt_txt( file, i )
            
             filepath = self.context.read_write.textDir.joinpath( file['filename'] )

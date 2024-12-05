@@ -27,9 +27,9 @@ class GUI_EncryptFiles( GuiModule ):
         
         self.current_position = Vector2( 0, 50 )
         
-        self.is_encrypted = self.context.read_write.hasPasswordsFile()
+        is_encrypted = self.context.read_write.hasPasswordsFile()
 
-        if self.is_encrypted:
+        if is_encrypted:
             placeholder = Label( self, text=f"Files are already encrypted")
             placeholder.pack()
         else:
