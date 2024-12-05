@@ -167,7 +167,7 @@ class GUI_ShareFiles( GuiModule ):
 
     def _debugClearFiles( self ) -> None:
         """Debug function to clear all files 'txt' and 'pdf'"""
-        self.context.read_write.removeTextFiles()
+        self.context.read_write.removeTransferFiles()
         self.context.read_write.removePdfFiles()
 
     def onStart( self ):
