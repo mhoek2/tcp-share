@@ -3,6 +3,7 @@ files/*
 
 # Folders and files formerly created by the application
 pdf_files/*
+fake_Nick_file.txt
 Generated_keys.txt
 Keys_test.txt
 Picked_keys.txt
