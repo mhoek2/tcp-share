@@ -68,6 +68,12 @@ class TCP:
                             content_bytes = base64.b64decode( content )
                             self.context.read_write.writePdfFile( filename, content_bytes )
                         else:
+                            # either normalize line-endings,  
+                            # or transition read_write.writeFile() to use write_bytes
+                            # and have TCP only send files are bytes
+                            content = content.replace('\r\n', '\n')
+                            content = content.replace('\r', '')
+
                             self.context.read_write.writeTextFile( filename, content )
 
                         send_data = { 'success': 'File received successfully!' }
