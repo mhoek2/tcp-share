@@ -78,6 +78,8 @@ class Translate:
             meta['language'] = out_lang
             self.context.read_write.writeMetaFile( meta )
 
+        self.context.bg_worker_force_file_update()
+
         modal.destroy()
 
     def openTranslateModal( self ) -> None:
