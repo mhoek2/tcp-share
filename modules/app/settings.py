@@ -14,6 +14,7 @@ class Settings:
         self.txt_subdir = "txt"
         self.pdf_subdir = "pdf"
         self.password_file = "passwords.secret"
+        self.meta_file = "files.meta"
 
         # placeholder to illustrate good practice of keeping things dynamic
         self.file_prefix = "file_"

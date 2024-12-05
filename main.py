@@ -7,6 +7,7 @@ import time
 from modules.app.settings import Settings
 from modules.app.gui import Gui
 from modules.app.read_write import ReadWrite
+from modules.translate import Translate
 
 # app modules
 from modules.crypt import Crypt
@@ -22,6 +23,7 @@ class Application( Tk ):
         self.tcp : TCP = TCP( self ) 
         self.read_write : ReadWrite = ReadWrite()
 
+        self.translate : Translate = Translate( self )
         self.tk_root : Gui = Gui( self )
         
         # empty placeholder modules

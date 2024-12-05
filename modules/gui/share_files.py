@@ -11,6 +11,7 @@ import subprocess
 from pathlib import Path
 
 from modules.tcp import TCP
+from modules.translate import Translate
 
 class GUI_ShareFiles( GuiModule ):
 
@@ -133,11 +134,18 @@ class GUI_ShareFiles( GuiModule ):
         self.context.to_pdf.txt_to_pdf()
         print("create pdf")
 
-    def drawBrowseButtons( self ) -> None:
+    def drawActionButtons( self ) -> None:
+        # browse txt files
         browse_txt = Button( self, text = "browse txt", 
                command = lambda : self.goToViewFiles() )
         browse_txt.place( x = (self.settings.appplication_width / 2 ) - 125, 
                       y = self.current_position.y )
+
+
+        # translate button
+        refresh = Button( self, text = "Translate", 
+               command = lambda : self.context.translate.openTranslateModal() )
+        refresh.place( x = (self.settings.appplication_width / 2 ) - 45, y = self.current_position.y )
 
         # If PDF files exist, draw browse button
         # Otherwise draw the create button
@@ -169,11 +177,15 @@ class GUI_ShareFiles( GuiModule ):
 
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
-                    
-        self.device_frame = {}
-        self.current_position = Vector2( 0, 50 )
+            
+        language : Translate.Language_t = self.context.translate.getCurrentLanguage()
+        lang = Label( self, text=f"Taal: {language['name']}")
+        lang.pack()
 
-        self.drawBrowseButtons()
+        self.device_frame = {}
+        self.current_position = Vector2( 0, 80 )
+
+        self.drawActionButtons()
 
         self.current_position.y += 40
 

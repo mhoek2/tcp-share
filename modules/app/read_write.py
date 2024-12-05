@@ -1,5 +1,6 @@
 from pathlib import Path
-
+import os
+import json 
 from modules.app.settings import Settings
 
 
@@ -46,6 +47,19 @@ class ReadWrite:
         return bool(files)
 
     def getTextFiles(self) -> list:
+        """Get all text files."""
+
+        files = [   item
+            for item in self.getFiles(self.textDir)
+            if any(
+                os.path.splitext(item["filename"])[1] == f".{keyword}"
+                for keyword in ["txt"]
+            )
+        ]
+
+        return files
+
+    def getTransferFiles(self) -> list:
         """Get all text files."""
         return self.getFiles(self.textDir)
 
@@ -105,3 +119,21 @@ class ReadWrite:
 
         file_path.write_bytes(contents)
         print(f"{file_path} saved succesfully!")
+
+    def hasMetaFile(self) -> bool:
+        """Check whether the passwords file exists."""
+        file_path = self.textDir.joinpath(self.settings.meta_file)
+        return file_path.exists() and file_path.is_file and file_path.stat().st_size > 0
+
+    def getMetaFile(self) -> list:
+        """Get the contents of the password file."""
+        file_path = self.textDir.joinpath(self.settings.meta_file)
+
+        if self.hasMetaFile():
+            return json.loads(file_path.read_text())
+        else:
+            return {}
+
+    def writeMetaFile( self , contents ):
+        file_path = self.textDir.joinpath(self.settings.meta_file)
+        self.writeFile(file_path, json.dumps(contents))

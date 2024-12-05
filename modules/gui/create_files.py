@@ -35,11 +35,20 @@ class GUI_CreateFiles(GuiModule):
             widget["textbox"].place(x=0, y=self.current_position.y)
             self.current_position.y += 112
 
+    def writeMeta(self):
+        """Create meta file with language entry"""
+        meta = self.context.read_write.getMetaFile()
+        meta['language'] = self.selected_language.get()
+
+        self.context.read_write.writeMetaFile( meta )
+
     def saveFiles(self):
         for widget in self.widgets:
             file_name = f"{widget['header']['text']}.txt"
             file_content = widget["textbox"].get(1.0, "end-1c")
             self.context.read_write.writeTextFile(file_name, file_content)
+
+        self.writeMeta()
 
     def onStart(self):
         lan_info = tk.Label(
@@ -70,6 +79,18 @@ class GUI_CreateFiles(GuiModule):
         numfiles = range(0, self.context.settings.num_files)
         self.drawWidgets(numfiles)
 
+        # Language dropdown
+        options = [language['api_id'] for language in self.context.translate.languages] 
+
+        self.selected_language = tk.StringVar()
+        self.selected_language.set( self.context.translate.default_language['api_id'] ) 
+
+        drop = tk.OptionMenu( self , self.selected_language , *options ) 
+        drop.place(
+            x=30,
+            y=self.settings.appplication_height - 40,
+        )
+  
         save_button = tk.Button(self, text="Opslaan", command=self.saveFiles)
         save_button.place(
             x=self.settings.appplication_width - 64,
