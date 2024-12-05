@@ -54,6 +54,7 @@ class Application( Tk ):
     def bg_worker( self ) -> None:
         self.bg_worker_tick = 0
         self.bg_worker_force_gui = False
+        self.bg_worker_force_files = False
 
         self.bg_worker = threading.Thread( target=self.bg_worker_do, daemon=True )
         self.bg_worker.start()
@@ -61,6 +62,10 @@ class Application( Tk ):
     def bg_worker_force_gui_update( self ):
         """"Force a pass in the background worker to enter the GUI pass"""
         self.bg_worker_force_gui = True
+
+    def bg_worker_force_file_update( self ):
+        """"Force a file update pass in the background worker"""
+        self.bg_worker_force_files = True
 
     #
     # perhaps 'has_files' and 'file_count_changed' should be moved to modules/app/read_write.py?
@@ -118,7 +123,7 @@ class Application( Tk ):
             has_files = self.has_files()
             num_changed = self.file_count_changed()
 
-            if num_changed:
+            if num_changed or self.bg_worker_force_files:
                 if has_files and self.tk_root.current_frame > self.tk_root.FRAME_CREATE_FILES:
                     # reload the current frame/page
                     reload_frame : bool = True # redundant bool ..
@@ -128,6 +133,9 @@ class Application( Tk ):
                     self.tk_root.after( 10, self.tk_root.goHome() )
                 
                 self.update_previous_file_count()
+
+                if self.bg_worker_force_files:
+                    self.bg_worker_force_files = False
 
             # Update the device list every X seconds when the share_files frame is open.
             # If self.bg_worker_force_gui is True, trigger an earlier update.
