@@ -81,7 +81,7 @@ class Crypt:
         (and already contains the correct amount of passwords).
         """
         if (
-            self.context.read_write.hasPasswordsFile
+            self.context.read_write.hasPasswordsFile()
             and len(self.context.read_write.getPasswordsFile()) == amount
         ):
             return
