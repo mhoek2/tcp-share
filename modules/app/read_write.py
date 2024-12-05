@@ -40,7 +40,7 @@ class ReadWrite:
 
     def hasTextFiles(self) -> bool:
         """Check if there are any text files."""
-        files = self.getFiles(self.textDir, True)
+        files = self.getTextFiles()
         self.numShareableFiles = len(files)
         return bool(files)
 
