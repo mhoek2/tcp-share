@@ -30,6 +30,10 @@ class QRCode:
             file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{qr_code_language['api_id']}.png" ) 
             print(file_path)
 
+            if not file_path.is_file():
+                print( f"Error: file not found - {file_path}")
+                continue
+
             qr_code_image = PhotoImage(file=file_path)
 
             label = Label( modal, image=qr_code_image)
