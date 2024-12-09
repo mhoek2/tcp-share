@@ -19,6 +19,7 @@ class ReadWrite:
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
+        self.passwords_file = self.textDir.joinpath(self.settings.password_file)
 
         self.suffix = self.settings.file_encrypted_suffix
         self.exceptions = [self.suffix, self.settings.password_file, "_decrypted"]
@@ -78,7 +79,7 @@ class ReadWrite:
 
     def hasPasswordsFile(self) -> bool:
         """Check whether the passwords file exists."""
-        file = Path(self.textDir).joinpath(self.settings.password_file)
+        file = self.passwords_file
 
         return file.exists() and file.is_file and file.stat().st_size > 0
 
@@ -111,11 +112,12 @@ class ReadWrite:
             if self.suffix in item["filename"]
         ]
 
-    def getPasswordsFile(self) -> list[str]:
+    def getKeys(self) -> list[str]:
         """Get the contents of the password file."""
-        file_path = self.textDir.joinpath(self.settings.password_file)
-
-        return json.loads(file_path.read_text())
+        if not self.hasPasswordsFile():
+            return []
+        
+        return json.loads(self.passwords_file.read_text())
 
     def getPdfFiles(self) -> list[FilesDict]:
         """Get all PDF files."""
@@ -135,9 +137,8 @@ class ReadWrite:
         self.writeFile(file_path, contents)
 
     def writePasswordsFile(self, contents: list[str]) -> None:
-        """Write to a passwords file."""
-        file_path = self.textDir.joinpath(self.settings.password_file)
-        self.writeFile(file_path, json.dumps(contents))
+        """Write to the passwords file."""
+        self.writeFile(self.passwords_file, json.dumps(contents))
 
     def writePdfFile(self, file_name: str, contents: bytes) -> None:
         """Write a pdf file."""
@@ -150,9 +151,10 @@ class ReadWrite:
 
     def removeFiles(self, path: Path) -> None:
         """Remove all files in a certain directory."""
-        for file in path.glob("*"):
-            if file.is_file():
-                file.unlink()
+        if path.is_dir():
+            for file in path.glob("*"):
+                if file.is_file():
+                    file.unlink()
 
     def removeTextFiles(self) -> None:
         """

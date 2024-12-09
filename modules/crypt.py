@@ -13,9 +13,6 @@ class Crypt:
         self.settings = context.settings
         self.encrypted_suffix = self.settings.file_encrypted_suffix
 
-        # self.test_encrypt()
-        # self.test_decrypt()
-
     def test_encrypt(self) -> None:
         """
         Function to test generating the keys.
@@ -26,7 +23,7 @@ class Crypt:
         # 2. Write the keys to a file
         self.context.read_write.writePasswordsFile(keys)
         # 3. Read the passwords file and assign its contents to a variable
-        contents = self.context.read_write.getPasswordsFile()
+        contents = self.context.read_write.getKeys()
         # 4. Get the current amount of text files (excluding already
         #      encrypted files and the password file itself)
         amount = len(self.context.read_write.getTextFiles())
@@ -51,11 +48,7 @@ class Crypt:
         Generate and return a list of 50 keys (or whatever the value of
         the num_salts setting is.)
         """
-        output_keys: list[str] = []
-        for _ in range(0, self.settings.num_salts):
-            key = Fernet.generate_key()
-            output_keys.append(key.decode())
-        return output_keys
+        return [Fernet.generate_key().decode() for _ in range(self.settings.num_salts)]
 
     def pick_keys(self, contents: list[str], amount: int) -> list[str]:
         """
@@ -63,16 +56,11 @@ class Crypt:
         (In principle, the amount of keys is equal to the amount of
         unencrypted text files.)
         """
-        output_picked_keys: list[str] = []
-        for _ in range(0, amount):
-            choice = random.choice(contents)
-            output_picked_keys.append(choice)
-            contents.remove(choice)
-        return output_picked_keys
+        return random.sample(contents, amount)
 
     def get_password_from_file(self, i: int) -> str:
         """Read the passwords file and return the i-th key."""
-        contents = self.context.read_write.getPasswordsFile()
+        contents = self.context.read_write.getKeys()
         return contents[i]
 
     def make_passwords_file(self, amount: int) -> None:
@@ -80,18 +68,17 @@ class Crypt:
         Make the passwords file, but only if it has not already been made
         (and already contains the correct amount of passwords).
         """
-        if (
-            self.context.read_write.hasPasswordsFile()
-            and len(self.context.read_write.getPasswordsFile()) == amount
-        ):
+        existing_keys = self.context.read_write.getKeys()
+        if self.context.read_write.hasPasswordsFile() and len(existing_keys) == amount:
             return
+
         # Generate the keys for encryption and write the keys to a file.
         self.context.read_write.writePasswordsFile(self.generate_keys())
 
         # Pick the given number of passwords (i) from the file,
         #   and overwrite the file with those picked passwords.
         self.context.read_write.writePasswordsFile(
-            self.pick_keys(self.context.read_write.getPasswordsFile(), amount)
+            self.pick_keys(self.context.read_write.getKeys(), amount)
         )
 
     def encrypt_files(self) -> None:
