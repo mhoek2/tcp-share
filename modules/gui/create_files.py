@@ -80,10 +80,11 @@ class GUI_CreateFiles(GuiModule):
         self.drawWidgets(numfiles)
 
         # Language dropdown
+        default_language = self.context.translate.getDefaultLanguage()
         options = [language['api_id'] for language in self.context.translate.languages] 
 
         self.selected_language = tk.StringVar()
-        self.selected_language.set( self.context.translate.default_language['api_id'] ) 
+        self.selected_language.set( default_language['api_id'] ) 
 
         drop = tk.OptionMenu( self , self.selected_language , *options ) 
         drop.place(

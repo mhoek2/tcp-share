@@ -13,6 +13,7 @@ class Settings:
         self.filesdir = f"{self.rootdir}\\files\\"
         self.txt_subdir = "txt"
         self.pdf_subdir = "pdf"
+        self.qr_subdir = "qr"
         self.password_file = "passwords.secret"
         self.meta_file = "files.meta"
 

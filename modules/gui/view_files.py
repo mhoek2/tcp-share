@@ -6,16 +6,28 @@ from tkinter import *
 from tkinter.font import BOLD
 from tkinter.scrolledtext import ScrolledText
 
+from modules.translate import Translate
+
 class GUI_ViewFiles( GuiModule ):
 
     def drawFile( self, file, frame ):
-        header = Label( frame, text=f"{file['filename']}", anchor='w')
-        header.pack( side=TOP, fill='x' )
+        header_frame = Frame(frame)
+        header_frame.pack(side=TOP, fill='x', pady=0, padx=(0,20))
+
+        header = Label( header_frame, text=f"{file['filename']}", anchor='w')
+        header.pack( side=LEFT, fill='x' )
+
+        # QR button
+        qr_image = PhotoImage( file=self.settings.rootdir.joinpath( "assets\\qr_button.png" ) )
+        file['gui']['qr'] = Button( header_frame, image=qr_image, state=NORMAL,
+                command = lambda param=file['filename']: self.context.qrcode.openQrCodeModal(param) )
+        file['gui']['qr'].pack( side=RIGHT, )
+        file['gui']['qr'].image = qr_image
 
         file['gui']['text'] = ScrolledText( frame , height=7, width=46 ) 
         file['gui']['text'].insert( END, file['contents'] ) 
         file['gui']['text'].config( state=DISABLED )
-        file['gui']['text'].pack( side=TOP, pady=5, padx=4 ) 
+        file['gui']['text'].pack( side=TOP, pady=5, padx=4 )
 
     def encryptOrDecryptFiles( self, state ):
         print(f"State = {int(state)} aka: {self.crypt_button_text[state]} ")
@@ -36,7 +48,7 @@ class GUI_ViewFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
 
-        language = self.context.translate.getCurrentLanguage()
+        language : Translate.Language_t = self.context.translate.getCurrentLanguage()
         lang = Label( self, text=f"Taal: {language['name']}")
         lang.pack()
 
