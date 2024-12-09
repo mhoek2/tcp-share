@@ -18,6 +18,8 @@ class ReadWrite:
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
+        self.qrDir = self.dir.joinpath(self.settings.qr_subdir)
+
        
         self.password_file = self.textDir.joinpath( self.settings.password_file )
 

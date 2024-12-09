@@ -12,23 +12,27 @@ class Translate:
         short: str
         name: str
         api_id: str
+        color: str
 
     def __init__( self, context ) -> None:
         self.context = context
         self.settings : Settings = context.settings
 
-        self.LANG_NL = 0
-        self.LANG_DE = 1
-        self.LANG_FR = 2
+        self.LANG_NL : int = 0
+        self.LANG_DE : int = 1
+        self.LANG_FR : int = 2
 
         self.languages: List[ self.Language_t ] = [
-            { 'short': 'NL', 'name': 'Nederlands', 'api_id': 'nl' },
-            { 'short': 'DE', 'name': 'Duits', 'api_id': 'de' },
-            { 'short': 'FR', 'name': 'Frans', 'api_id': 'fr' },
+            { 'short': 'NL', 'name': 'Nederlands', 'api_id': 'nl', 'color':'green' },
+            { 'short': 'DE', 'name': 'Duits', 'api_id': 'de', 'color':'yellow' },
+            { 'short': 'FR', 'name': 'Frans', 'api_id': 'fr', 'color':'red' },
         ]
 
-        self.default_language_id = self.LANG_NL
-        self.default_language = self.languages [ self.default_language_id ]
+        self.default_language_id : int = self.LANG_NL
+        self.default_language : self.Language_t = self.languages [ self.default_language_id ]
+
+    def getLanguage( self, lang_id ) -> Language_t:
+        return self.languages[lang_id]
 
     def getCurrentLanguage( self ) -> Language_t:
         meta = self.context.read_write.getMetaFile()
@@ -39,18 +43,19 @@ class Translate:
 
         return self.default_language
 
+    def update_meta_language( self, lang_id ):
+        """Store the language api_id in meta file. eg 'nl', 'de', 'fr'"""
+        meta = self.context.read_write.getMetaFile()
+        meta['language'] = self.languages[ lang_id ]['api_id']
+
+        self.context.read_write.writeMetaFile( meta )
+
     def modalCallback( self, modal, lang_id ):
         files = self.context.read_write.getTextFiles()
-        meta = self.context.read_write.getMetaFile()
 
         if lang_id >= len( self.languages ):
             print("Error: language index out of bounds")
             return
-
-        in_lang = meta['language'] if 'language' in meta else "nl"
-        out_lang = self.languages[ lang_id ]['api_id']
-
-        print( f"translate from {in_lang} to {out_lang}:{self.languages[ lang_id ]['name']}")
 
         #is_encrypted = self.context.read_write.hasPasswordsFile()
         #
@@ -58,25 +63,21 @@ class Translate:
         #    self.context.crypt.decrypt_files()
         #    self.context.read_write.removePasswordFile()
 
-        valid : bool = True # gets overwritten by the API
+        valid : bool = True
 
-        for i, file in enumerate( files ):
-            valid, data = self.translate_text( file['contents'], in_lang=in_lang, out_lang=out_lang )
-            print(data)
+        for file in files:
+            valid, text = self.translate_text_file_content( file, lang_id )
 
-            # only store the contents if it was a valid output
             if valid:
-                filepath = self.context.read_write.textDir.joinpath( file['filename'] )
-                with open( filepath, 'w') as f:
-                    f.write( data )
+                self.context.read_write.writeTextFile( file['filename'], text )
+            else:
+                print( text )
 
         #if is_encrypted:
         #    self.context.crypt.encrypt_files()
 
-        # store the new language api_id. eg 'nl', 'de', 'fr'
         if valid:
-            meta['language'] = out_lang
-            self.context.read_write.writeMetaFile( meta )
+            self.update_meta_language( lang_id )
 
         self.context.bg_worker_force_file_update()
 
@@ -89,14 +90,38 @@ class Translate:
 
         Label(modal, text=f"Tekstbestand vertalen").pack( pady=10 )
         
-        meta = self.context.read_write.getMetaFile()
+        current_language : self.Language_t = self.getCurrentLanguage()
 
-        for i, language in enumerate(self.languages):
+        for lang_id, language in enumerate(self.languages):
             # disable current language button
-            button_state = DISABLED if 'language' in meta and meta['language'] == language['api_id'] else NORMAL
+            button_state = DISABLED if current_language['api_id'] == language['api_id'] else NORMAL
             
-            Button( modal, text=f"{self.languages[i]['name']}:{i}", state=button_state, 
-                   command=lambda param=modal, lang_id=i: self.modalCallback( param, lang_id ) ).pack( side=LEFT, padx=20, pady=20 )
+            Button( modal, text=f"{language['name']}", state=button_state, 
+                command=lambda param=modal, lang_id=lang_id: self.modalCallback( param, lang_id ) ).pack( side=LEFT, padx=20, pady=20 )
+
+    def translate_text_file_content( self, file, lang_id ):
+        """Translate"""
+        filename : str  = file['filename'];
+        text: str = file['contents'].decode('utf-8', errors='ignore');
+        valid : bool = False
+
+        current_language : self.Language_t = self.getCurrentLanguage()
+        qr_code_language : self.Language_t = self.languages[lang_id]
+
+        in_lang = current_language['api_id']
+        out_lang = qr_code_language['api_id']
+        print( f"translate from {in_lang} to {out_lang}:{self.languages[ lang_id ]['name']}")
+
+        if in_lang != out_lang:
+            valid, text = self.translate_text( text, in_lang, out_lang )
+        else:
+            text = text
+            valid = True # content is already in the requrested language
+
+        if not valid:
+            text = "Text not succesfully translated during QR code generation"
+        
+        return valid, text
 
     def translate_text( self, text, in_lang, out_lang ) -> str:
         """Use this free curl for now
