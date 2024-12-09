@@ -6,6 +6,8 @@ from tkinter import *
 from tkinter.font import BOLD
 from tkinter.scrolledtext import ScrolledText
 
+from modules.translate import Translate
+
 class GUI_ViewFiles( GuiModule ):
 
     def drawFile( self, file, frame ):
@@ -15,7 +17,12 @@ class GUI_ViewFiles( GuiModule ):
         file['gui']['text'] = ScrolledText( frame , height=7, width=46 ) 
         file['gui']['text'].insert( END, file['contents'] ) 
         file['gui']['text'].config( state=DISABLED )
-        file['gui']['text'].pack( side=TOP, pady=5, padx=4 ) 
+        file['gui']['text'].pack( side=TOP, pady=5, padx=4 )
+
+        # QR button
+        file['gui']['qr'] = Button( frame, text = "QR", state=NORMAL,
+                command = lambda param=file['filename']: self.context.qrcode.openQrCodeModal(param) )
+        file['gui']['qr'].pack( side=TOP, pady=5, padx=4 )
 
     def encryptOrDecryptFiles( self, state ):
         print(f"State = {int(state)} aka: {self.crypt_button_text[state]} ")
@@ -36,7 +43,7 @@ class GUI_ViewFiles( GuiModule ):
         header = Label( self, text=f"Aantal bestanden gevonden: {self.context.read_write.numShareableFiles}")
         header.pack()
 
-        language = self.context.translate.getCurrentLanguage()
+        language : Translate.Language_t = self.context.translate.getCurrentLanguage()
         lang = Label( self, text=f"Taal: {language['name']}")
         lang.pack()
 

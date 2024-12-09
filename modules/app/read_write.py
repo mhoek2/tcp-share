@@ -18,6 +18,7 @@ class ReadWrite:
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
+        self.qrDir = self.dir.joinpath(self.settings.qr_subdir)
 
     def getFiles(self, path: Path, count_only: bool = False) -> list:
         """Get all files in a certain directory."""

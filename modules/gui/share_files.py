@@ -202,6 +202,11 @@ class GUI_ShareFiles( GuiModule ):
                command = lambda : self.context.bg_worker_force_gui_update() )
         refresh.place( x = 20, y = self.current_position.y )
 
+        # debug button to create QR codes
+        debug_create_qr = Button( self, text = "Create QR", 
+               command = lambda : self.context.qrcode.create_qr_codes() )
+        debug_create_qr.place( x = 120, y = self.current_position.y )
+
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()
 
