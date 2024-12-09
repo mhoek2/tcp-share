@@ -24,8 +24,8 @@ class QRCode:
 
         Label(modal, text=f"QR Codes for {filename}").pack( pady=10 )
 
-        for lang_id, language in enumerate(self.translate.languages):
-            qr_code_language = self.translate.languages[lang_id]
+        for lang in self.translate.languages:
+            qr_code_language : Translate.Language_t = lang
             filename =  os.path.splitext(filename)[0]
             file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{qr_code_language['api_id']}.png" ) 
             print(file_path)
@@ -36,15 +36,14 @@ class QRCode:
             label.pack( side=LEFT )
             label.image = qr_code_image  
 
-    def create_qr_code_for_file_lang( self, file, lang_id ):
+    def create_qr_code_for_file_lang( self, file, lang : Translate.Language_t ):
         """Create a QR code of the translated content of a file"""
-        valid, text = self.translate.translate_text_file_content( file, lang_id )
+        valid, text = self.translate.translate_text_file_content( file, lang )
 
         if not valid:
             print( text )
             return
 
-        language: Translate.Language_t = self.translate.getLanguage( lang_id )
         filename : str = file['filename'];
 
         qr = qrcode.QRCode(
@@ -53,10 +52,10 @@ class QRCode:
         )
         qr.add_data( text )
         qr.make( fit=True )
-        img = qr.make_image( fill_color=language['color'], back_color="black" )
+        img = qr.make_image( fill_color=lang['color'], back_color="black" )
 
         filename = os.path.splitext(filename)[0] # use os lib for now
-        file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{language['api_id']}.png" ) 
+        file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{lang['api_id']}.png" ) 
         img.save( file_path )
 
         return
@@ -68,8 +67,8 @@ class QRCode:
 
         files = self.context.read_write.getTextFiles()
 
-        for lang_id, language in enumerate( self.translate.languages ):
+        for lang in self.translate.languages:
             for file in files:
-                self.create_qr_code_for_file_lang( file, lang_id )
+                self.create_qr_code_for_file_lang( file, lang )
 
         return
