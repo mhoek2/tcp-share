@@ -65,6 +65,9 @@ class QRCode:
 
         filename = os.path.splitext(filename)[0] # use os lib for now
         file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{lang['api_id']}.png" ) 
+        
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        
         img.save( file_path )
 
         return
