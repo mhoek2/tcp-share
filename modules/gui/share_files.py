@@ -165,6 +165,34 @@ class GUI_ShareFiles( GuiModule ):
         
         self.current_position.y += 25
 
+    def drawEncryptedIndicator(self) -> None:
+        """
+        Draw a label that indicates whether the files are encrypted or not.
+        The border is defined with a Frame, and the Label is placed within the Frame.
+        """
+        status = "Er waren geen tekstbestanden gevonden!"
+        fg_colour = "whitesmoke"
+        bg_colour = "lightgrey"
+
+        if self.context.read_write.hasAnyTextFiles():
+            if self.context.read_write.hasPasswordsFile():
+                status = "De tekstbestanden zijn versleuteld!"
+                fg_colour = "palegreen"
+                bg_colour = "lightgreen"
+            else:
+                status = "De tekstbestanden zijn niet versleuteld!"
+                fg_colour = "lightpink"
+                bg_colour = "lightcoral"
+
+        border = Frame(self, background=bg_colour, borderwidth=2)
+
+        indicator = Label(
+            border, text=status, fg="black", bg=fg_colour, font=("Helvetica", 14, "bold")
+        )
+
+        indicator.pack()
+        border.pack()
+
     def _debugClearFiles( self ) -> None:
         """Debug function to clear all files 'txt' and 'pdf'"""
         self.context.read_write.removeTransferFiles()
@@ -185,6 +213,10 @@ class GUI_ShareFiles( GuiModule ):
 
         self.device_frame = {}
         self.current_position = Vector2( 0, 80 )
+        
+        self.drawEncryptedIndicator()
+        
+        self.current_position = Vector2( 0, 110 )
 
         self.drawActionButtons()
 
