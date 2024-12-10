@@ -32,6 +32,8 @@ class QRCode:
         for lang in self.translate.languages:
             qr_code_language : Translate.Language_t = lang
             filename =  os.path.splitext(filename)[0]
+            filename = filename.replace(self.settings.file_encrypted_suffix, "")
+            
             file_path = self.context.read_write.qrDir.joinpath( f"{filename}_{qr_code_language['api_id']}.png" ) 
             print(file_path)
 
