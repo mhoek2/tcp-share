@@ -62,12 +62,7 @@ class ReadWrite:
 
     def hasTextFiles(self) -> bool:
         """Check if there are any unencrypted text files."""
-        files = [
-            item
-            for item in self.getFiles(self.textDir, True)
-            if item["filename"].endswith(".txt")
-            and not any(keyword in item["filename"] for keyword in self.exceptions)
-        ]
+        files = self.getTextFilesByAuth()
 
         self.numShareableFiles = len(files)
         return bool(files)
