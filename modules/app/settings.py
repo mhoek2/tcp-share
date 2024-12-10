@@ -18,9 +18,9 @@ class Settings:
 
         # placeholder to illustrate good practice of keeping things dynamic
         self.file_prefix = "file_"
+        self.file_encrypted_suffix = "_encrypted"
         self.num_files = 3
-        self.num_salts = 50;
-        self.num_final_salts = self.num_files;
+        self.num_salts = 50
 
         # tcp
         self.server_ip = '127.0.0.1'
