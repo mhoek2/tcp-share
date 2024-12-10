@@ -171,6 +171,11 @@ class ReadWrite:
                 if file.is_file():
                     if not any(keyword in file.name for keyword in self.exceptions):
                         file.unlink()
+    
+    def removePasswordsFile(self) -> None:
+        """Remove the file containing all the keys."""
+        if self.passwords_file.exists() and self.passwords_file.is_file():
+            self.passwords_file.unlink()
 
     def removePdfFiles(self) -> None:
         """Remove all pdf files."""

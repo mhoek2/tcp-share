@@ -95,6 +95,8 @@ class Crypt:
                 new_filename, decrypted_contents.decode()
             )
 
+        self.context.read_write.removePasswordsFile()
+
     def decrypt_text(self, text: bytes, i: int) -> bytes:
         """
         Decrypt text with the given password (retrieved with get_password_from_file)
