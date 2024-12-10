@@ -22,7 +22,7 @@ class ReadWrite:
         self.passwords_file = self.textDir.joinpath(self.settings.password_file)
 
         self.suffix = self.settings.file_encrypted_suffix
-        self.exceptions = [self.suffix, self.settings.password_file, "_decrypted"]
+        self.exceptions = [self.suffix, self.settings.password_file]
 
     class FilesDict(TypedDict):
         filename: str
@@ -60,7 +60,7 @@ class ReadWrite:
             for item in self.getFiles(self.textDir, True)
             if item["filename"].endswith(".txt")
             and not any(
-                keyword in item["filename"] for keyword in [self.suffix, "_decrypted"]
+                keyword in item["filename"] for keyword in self.exceptions
             )
         ]
 
@@ -100,7 +100,7 @@ class ReadWrite:
             for item in self.getFiles(self.textDir)
             if item["filename"].endswith(".txt")
             and not any(
-                keyword in item["filename"] for keyword in [self.suffix, "_decrypted"]
+                keyword in item["filename"] for keyword in self.exceptions
             )
         ]
 

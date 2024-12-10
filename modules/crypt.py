@@ -90,7 +90,7 @@ class Crypt:
         for i, file in enumerate(files):
             decrypted_contents = self.decrypt_text(file["contents"], i)
 
-            new_filename = file["filename"].replace(self.encrypted_suffix, "_decrypted")
+            new_filename = file["filename"].replace(self.encrypted_suffix, "")
             self.context.read_write.writeTextFile(
                 new_filename, decrypted_contents.decode()
             )
