@@ -96,6 +96,11 @@ class Translate:
         modal.title( f"Vertalen" )
         modal.grab_set()
 
+        # move modal on top of main window
+        x = self.context.tk_root.winfo_x()
+        y = self.context.tk_root.winfo_y()
+        modal.geometry("+%d+%d" %(x+50,y+10))
+
         Label(modal, text=f"Tekstbestand vertalen").pack( pady=10 )
         
         current_language : self.Language_t = self.getCurrentLanguage()

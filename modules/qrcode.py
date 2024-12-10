@@ -22,6 +22,11 @@ class QRCode:
         modal.title( f"QR Codes" )
         modal.grab_set()
 
+        # move modal on top of main window
+        x = self.context.tk_root.winfo_x()
+        y = self.context.tk_root.winfo_y()
+        modal.geometry("+%d+%d" %(x-50,y+10))
+
         Label(modal, text=f"QR Codes for {filename}").pack( pady=10 )
 
         for lang in self.translate.languages:
