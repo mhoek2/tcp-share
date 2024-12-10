@@ -1,4 +1,5 @@
 # app core modules
+from typing import TypedDict
 from modules.app.settings import Settings
 
 import socket
@@ -8,6 +9,11 @@ import platform
 import base64
 
 class TCP:
+
+    class Server_t(TypedDict):
+        ip: str
+        port: int
+
     def __init__( self, context ) -> None:
         self.context = context;
         self.settings : Settings = context.settings
@@ -79,7 +85,7 @@ class TCP:
         return
 
     # client
-    def client_connect( self, server, timeout=10 ) -> None:
+    def client_connect( self, server : Server_t, timeout=10 ) -> None:
         """Connect to a socket stream and return the instance, or False on timeout
 
            Parameters
@@ -99,7 +105,7 @@ class TCP:
         s.settimeout(timeout)
 
         try:
-            s.connect( ( server[0], server[1] ) )
+            s.connect( ( server['ip'], server['port'] ) )
  
             received = s.recv( self.settings.bufsize_meta ).decode('utf-8')
  
@@ -121,7 +127,7 @@ class TCP:
         """
         s.close()
 
-    def client_send_file( self, server, filename : str, content : str ):
+    def client_send_file( self, server : Server_t, filename : str, content : str ):
         """Connect to a socket stream and send over a file, then close the stream
 
            Parameters
@@ -167,7 +173,7 @@ class TCP:
 
         self.client_disconnect( s )
 
-    def get_boolean( self, server, parameter ):
+    def get_boolean( self, server : Server_t, parameter ):
        """Connect to a socket stream and request a boolean state, then close the stream
 
            Parameters
@@ -196,7 +202,7 @@ class TCP:
 
        return bool( rcv_data['value'] ) if 'value' in rcv_data else False
 
-    def get_allow_receive( self, server ):
+    def get_allow_receive( self, server : Server_t ):
         """Connect to a socket stream and request a boolean state, then close the stream
 
            Parameters
