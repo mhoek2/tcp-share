@@ -119,6 +119,16 @@ class ReadWrite:
             if self.encrypted_suffix in item["filename"]
         ]
 
+    def getTransferFiles( self ) -> list[FilesDict]:
+        files = self.getTextFilesByAuth()
+
+        # get additional files ( meta, and passwords )
+        for item in self.getAllTextFiles():
+            if not item["filename"].endswith(".txt"):
+                files.append(item)
+
+        return files
+
     def getTextFilesByAuth( self ) -> list[FilesDict]:
         """Get encrypted or decrypted files based on crypt state"""
         files = []
