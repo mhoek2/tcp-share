@@ -7,8 +7,6 @@ from modules.app.settings import Settings
 from modules.gui.create_files import *
 from modules.gui.share_files import *
 from modules.gui.view_files import *
-from modules.gui.encrypt_files import *
-from modules.gui.decrypt_files import *
 
 import tkinter as tk
 
@@ -52,17 +50,13 @@ class Gui( tk.Tk ):
         self.FRAME_CREATE_FILES = 0;
         self.FRAME_SHARE_FILES = 1;
         self.FRAME_VIEW_FILES = 2;
-        self.FRAME_ENCRYPT_FILES = 3;
-        self.FRAME_DECRYPT_FILES = 4;
 
         # Register each GUI module in the self.frames dictionary
         # - If you want to extend this, create a new GUI_* class, 
         #   and import the class at the start of this file
         for i, module in enumerate((GUI_CreateFiles,
                                     GUI_ShareFiles,
-                                    GUI_ViewFiles,
-                                    GUI_EncryptFiles,
-                                    GUI_DecryptFiles)):
+                                    GUI_ViewFiles )):
             self.create_frame( module, i)
 
     def is_frame_active( self, index ):

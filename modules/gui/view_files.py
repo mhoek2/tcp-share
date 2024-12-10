@@ -29,11 +29,30 @@ class GUI_ViewFiles( GuiModule ):
         file['gui']['text'].config( state=DISABLED )
         file['gui']['text'].pack( side=TOP, pady=5, padx=4 )
 
-    def encryptOrDecryptFiles( self, state ):
-        print(f"State = {int(state)} aka: {self.crypt_button_text[state]} ")
+    def Encrypt( self ):
+        """At this point, 50 keys are going to generated, of which 3 are randomly chosen.
+        Then the contents of the files should be overwritten with the output of the encryption
+        Libary of choice, also the passwords used must be stored in a file called passwords.secret .."""
+        self.context.crypt.encrypt_files()
+        return
+
+    def Decrypt( self ):
+        """This will draw each file in its original decrypted state"""
+        self.context.crypt.decrypt_files()
+        self.context.read_write.removePasswordFile()
+        return
+
+    def encryptOrDecryptFiles( self, is_encrypted : bool ):
+        print(f"State = {int(is_encrypted)} aka: {self.crypt_button_text[is_encrypted]} ")
         
-        reload_frame : bool = True # redundant bool ..
-        self.gui.show_frame( self.crypt_button_frame[state], reload_frame )
+        if is_encrypted:
+            self.Decrypt()
+        else:
+            self.Encrypt()
+
+        self.gui.goHome()
+        #reload_frame : bool = True # redundant bool ..
+        #self.gui.show_frame( self.FRAME_VIEW_FILES, reload_frame )
 
     def on_frame_configure(self, event):
         # Update the scrollregion of the canvas whenever the content frame's size changes
@@ -48,7 +67,6 @@ class GUI_ViewFiles( GuiModule ):
         lang.pack()
 
         self.crypt_button_text = [ "Encrypt", "Decrypt" ]
-        self.crypt_button_frame = [ self.gui.FRAME_ENCRYPT_FILES, self.gui.FRAME_DECRYPT_FILES ]
         is_encrypted = self.context.read_write.hasPasswordsFile()
 
         self.current_position = Vector2( 0, 80 )
