@@ -1,4 +1,5 @@
-cryptography~=43.0.3
-tk
+cryptography
 fpdf
+qrcode
 requests
+tk
