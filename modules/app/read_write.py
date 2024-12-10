@@ -23,10 +23,13 @@ class ReadWrite:
         self.dir = Path(self.settings.filesdir).resolve()
         self.textDir = self.dir.joinpath(self.settings.txt_subdir)
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
+        self.qrDir = self.dir.joinpath(self.settings.qr_subdir)
+
         self.passwords_file = self.textDir.joinpath(self.settings.password_file)
 
         self.encrypted_suffix = self.settings.file_encrypted_suffix
         self.exceptions = [self.encrypted_suffix, self.settings.password_file]
+
 
     class FilesDict(TypedDict):
         filename: str
