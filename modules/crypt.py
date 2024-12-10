@@ -79,10 +79,8 @@ class Crypt:
 
     def decrypt_files(self) -> None:
         """
-        Decrypt all text files one by one.
-        (For now, the decrypted files are being saved with the suffix _decrypted,
-        but this can be changed to save without any suffix—
-        overwriting the original text files, if those were present.)
+        Decrypt all text files one by one. 
+        And store them in the original file
         It may be handy to first check whether the passwords file actually exists.
         """
         files = self.context.read_write.getEncryptedTextFiles()
@@ -94,6 +92,7 @@ class Crypt:
             self.context.read_write.writeTextFile(
                 new_filename, decrypted_contents.decode()
             )
+        self.context.read_write.removePasswordFile()
 
         self.context.read_write.removePasswordsFile()
 

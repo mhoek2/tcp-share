@@ -29,15 +29,29 @@ class GUI_ViewFiles( GuiModule ):
         file['gui']['text'].config( state=DISABLED )
         file['gui']['text'].pack( side=TOP, pady=5, padx=4 )
 
-    def encryptOrDecryptFiles( self, state ):
-        print(f"State = {int(state)} aka: {self.crypt_button_text[state]} ")
-        
-        reload_frame : bool = True # redundant bool ..
-        self.gui.show_frame( self.crypt_button_frame[state], reload_frame )
+    def Encrypt( self ):
+        """At this point, 50 keys are going to generated, of which 3 are randomly chosen.
+        Then the contents of the files should be overwritten with the output of the encryption
+        Libary of choice, also the passwords used must be stored in a file called passwords.secret .."""
+        self.context.crypt.encrypt_files()
+        return
 
-    def hasPasswordFile( self, file ):
-        if file['filename'] == self.settings.password_file:
-            self.is_encrypted = True
+    def Decrypt( self ):
+        """This will draw each file in its original decrypted state"""
+        self.context.crypt.decrypt_files()
+        return
+
+    def encryptOrDecryptFiles( self, is_encrypted ):
+        print(f"State = {int(is_encrypted)} aka: {self.crypt_button_text[is_encrypted]} ")
+        
+        if is_encrypted:
+            self.Decrypt()
+        else:
+            self.Encrypt()
+
+        self.gui.goHome()
+        #reload_frame : bool = True # redundant bool ..
+        #self.gui.show_frame( self.FRAME_VIEW_FILES, reload_frame )
 
 
     def on_frame_configure(self, event):
@@ -53,8 +67,7 @@ class GUI_ViewFiles( GuiModule ):
         lang.pack()
 
         self.crypt_button_text = [ "Encrypt", "Decrypt" ]
-        self.crypt_button_frame = [ self.gui.FRAME_ENCRYPT_FILES, self.gui.FRAME_DECRYPT_FILES ]
-        self.is_encrypted = False
+        is_encrypted = self.context.read_write.hasPasswordsFile()
 
         self.current_position = Vector2( 0, 80 )
 
@@ -77,10 +90,9 @@ class GUI_ViewFiles( GuiModule ):
         content_frame = Frame( self.canvas )
 
         # content
-        self.files = self.context.read_write.getTextFiles()
-        for file in self.files:
-            self.hasPasswordFile( file )
+        files = self.context.read_write.getTextFilesByAuth()
 
+        for file in files:
             file['gui'] = {}
             self.drawFile( file, content_frame )
 
@@ -91,8 +103,8 @@ class GUI_ViewFiles( GuiModule ):
         content_frame.bind( "<Configure>", self.on_frame_configure )
 
         # footer buttons
-        crypt = Button( self, text = self.crypt_button_text[self.is_encrypted], 
-               command = lambda : self.encryptOrDecryptFiles( self.is_encrypted ) )
+        crypt = Button( self, text = self.crypt_button_text[is_encrypted], 
+               command = lambda : self.encryptOrDecryptFiles( is_encrypted ) )
         crypt.place( x = self.settings.appplication_width - 70, 
                       y = self.settings.appplication_height - 40 )
 

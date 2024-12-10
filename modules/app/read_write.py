@@ -87,6 +87,10 @@ class ReadWrite:
         file = self.passwords_file
 
         return file.exists() and file.is_file and file.stat().st_size > 0
+    
+    def removePasswordFile( self ) -> None:
+        if self.passwords_file.is_file():
+            self.passwords_file.unlink()
 
     def hasPdfFiles(self) -> bool:
         """Check if there are any PDF files."""
@@ -114,6 +118,17 @@ class ReadWrite:
             for item in self.getFiles(self.textDir)
             if self.encrypted_suffix in item["filename"]
         ]
+
+    def getTextFilesByAuth( self ) -> list[FilesDict]:
+        """Get encrypted or decrypted files based on crypt state"""
+        files = []
+
+        if self.hasPasswordsFile():
+            files = self.getEncryptedTextFiles()
+        else:
+            files = self.getTextFiles()
+
+        return files
 
     def getKeys(self) -> list[str]:
         """Get the contents of the password file."""

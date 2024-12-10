@@ -17,10 +17,15 @@ class ToPDF:
         self.read_write: ReadWrite = context.read_write
 
     def txt_to_pdf(self):
-        if not self.read_write.hasTextFiles():
-            return
+        files = []
+        is_encrypted = self.context.read_write.hasPasswordsFile()
 
-        files = self.read_write.getTextFiles()
+        if is_encrypted:
+            # decrypt the files before reading
+            self.context.crypt.decrypt_files()
+
+        files = self.context.read_write.getTextFilesByAuth()
+
         for file in files:
             # Initialize PDF
             pdf = FPDF()
@@ -34,3 +39,7 @@ class ToPDF:
             output = pdf.output(dest="S").encode("latin1")
 
             self.context.read_write.writePdfFile(output_filename, output)
+
+        if is_encrypted:
+            # re-encrypt the files
+            self.context.crypt.encrypt_files()

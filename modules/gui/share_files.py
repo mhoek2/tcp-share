@@ -43,7 +43,7 @@ class GUI_ShareFiles( GuiModule ):
         modal.destroy()
 
     def send_txt_files( self, server : TCP.Server_t ):
-        files = self.context.read_write.getTransferFiles()
+        files = self.context.read_write.getAllTextFiles()
         
         print(f"Attempt to share files to: {server}")
         print(files)
