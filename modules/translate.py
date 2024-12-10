@@ -65,11 +65,11 @@ class Translate:
             print("Error: language is undefined")
             return
 
-        #is_encrypted = self.context.read_write.hasPasswordsFile()
-        #
-        #if is_encrypted:
-        #    self.context.crypt.decrypt_files()
-        #    self.context.read_write.removePasswordFile()
+        is_encrypted = self.context.read_write.hasPasswordsFile()
+
+        if is_encrypted:
+            # decrypt the files before reading
+            self.context.crypt.decrypt_files()
 
         valid : bool = True
         for file in files:
@@ -80,8 +80,9 @@ class Translate:
             else:
                 print( text )
 
-        #if is_encrypted:
-        #    self.context.crypt.encrypt_files()
+        if is_encrypted:
+            # re-encrypt the files
+            self.context.crypt.encrypt_files()
 
         if valid:
             self.update_meta_language( lang )
