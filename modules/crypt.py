@@ -13,36 +13,6 @@ class Crypt:
         self.settings = context.settings
         self.encrypted_suffix = self.settings.file_encrypted_suffix
 
-    def test_encrypt(self) -> None:
-        """
-        Function to test generating the keys.
-        (Basically obsolete now, as encrypt_files does the same.)
-        """
-        # 1. Generate the keys for encryption
-        keys = self.generate_keys()
-        # 2. Write the keys to a file
-        self.context.read_write.writePasswordsFile(keys)
-        # 3. Read the passwords file and assign its contents to a variable
-        contents = self.context.read_write.getKeys()
-        # 4. Get the current amount of text files (excluding already
-        #      encrypted files and the password file itself)
-        amount = len(self.context.read_write.getTextFiles())
-        # 5. Pick {amount} keys, so that there are as many keys as there
-        #      are files.
-        picked_keys = self.pick_keys(contents, amount)
-        # 6. Write the picked keys back to the passwords file, overwriting
-        #      the previous version (that still contained all the keys).
-        self.context.read_write.writePasswordsFile(picked_keys)
-        # 7. Encrypt all text files.
-        self.encrypt_files()
-
-    def test_decrypt(self) -> None:
-        """
-        Function to test decrypting the files.
-        Also basically obsolete now, especially as it only calls decrypt_files()
-        """
-        self.decrypt_files()
-
     def generate_keys(self) -> list[str]:
         """
         Generate and return a list of 50 keys (or whatever the value of
