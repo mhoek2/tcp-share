@@ -21,8 +21,8 @@ class ReadWrite:
         self.pdfDir = self.dir.joinpath(self.settings.pdf_subdir)
         self.passwords_file = self.textDir.joinpath(self.settings.password_file)
 
-        self.suffix = self.settings.file_encrypted_suffix
-        self.exceptions = [self.suffix, self.settings.password_file]
+        self.encrypted_suffix = self.settings.file_encrypted_suffix
+        self.exceptions = [self.encrypted_suffix, self.settings.password_file]
 
     class FilesDict(TypedDict):
         filename: str
@@ -59,9 +59,7 @@ class ReadWrite:
             item
             for item in self.getFiles(self.textDir, True)
             if item["filename"].endswith(".txt")
-            and not any(
-                keyword in item["filename"] for keyword in self.exceptions
-            )
+            and not any(keyword in item["filename"] for keyword in self.exceptions)
         ]
 
         self.numShareableFiles = len(files)
@@ -73,7 +71,7 @@ class ReadWrite:
             [
                 item
                 for item in self.getFiles(self.textDir, True)
-                if self.suffix in item["filename"]
+                if self.encrypted_suffix in item["filename"]
             ]
         )
 
@@ -99,9 +97,7 @@ class ReadWrite:
             item
             for item in self.getFiles(self.textDir)
             if item["filename"].endswith(".txt")
-            and not any(
-                keyword in item["filename"] for keyword in self.exceptions
-            )
+            and not any(keyword in item["filename"] for keyword in self.exceptions)
         ]
 
     def getEncryptedTextFiles(self) -> list[FilesDict]:
@@ -109,14 +105,14 @@ class ReadWrite:
         return [
             item
             for item in self.getFiles(self.textDir)
-            if self.suffix in item["filename"]
+            if self.encrypted_suffix in item["filename"]
         ]
 
     def getKeys(self) -> list[str]:
         """Get the contents of the password file."""
         if not self.hasPasswordsFile():
             return []
-        
+
         return json.loads(self.passwords_file.read_text())
 
     def getPdfFiles(self) -> list[FilesDict]:
@@ -171,7 +167,7 @@ class ReadWrite:
                 if file.is_file():
                     if not any(keyword in file.name for keyword in self.exceptions):
                         file.unlink()
-    
+
     def removePasswordsFile(self) -> None:
         """Remove the file containing all the keys."""
         if self.passwords_file.exists() and self.passwords_file.is_file():
