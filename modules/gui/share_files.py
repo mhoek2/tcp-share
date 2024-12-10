@@ -169,6 +169,7 @@ class GUI_ShareFiles( GuiModule ):
         """Debug function to clear all files 'txt' and 'pdf'"""
         self.context.read_write.removeTransferFiles()
         self.context.read_write.removePdfFiles()
+        self.context.read_write.removeQRFiles()
 
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )

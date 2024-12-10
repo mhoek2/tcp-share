@@ -200,6 +200,10 @@ class ReadWrite:
         if self.hasPdfFiles:
             self.removeFiles(self.pdfDir)
 
+    def removeQRFiles(self) -> None:
+        """Remove all qr files."""
+        self.removeFiles(self.qrDir)
+
     def hasMetaFile(self) -> bool:
         """Check whether the passwords file exists."""
         file_path = self.textDir.joinpath(self.settings.meta_file)
