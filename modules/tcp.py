@@ -1,5 +1,5 @@
 # app core modules
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 from modules.app.settings import Settings
 
 import socket
@@ -8,6 +8,9 @@ import subprocess
 import platform
 import base64
 
+if TYPE_CHECKING:
+    from main import Application
+
 class TCP:
 
     class Server_t(TypedDict):
@@ -15,7 +18,7 @@ class TCP:
         port: int
 
     def __init__( self, context ) -> None:
-        self.context = context;
+        self.context : "Application" = context;
         self.settings : Settings = context.settings
 
         # Get the LAN IP address of the device
@@ -71,6 +74,8 @@ class TCP:
                             self.context.read_write.writeTextFile( filename, content )
 
                         send_data = { 'success': 'File received successfully!' }
+
+                        self.context.log.log_file( filename, f"Received from: {addr[0]}" )
                     else:
                         print("Connections is refused!")
                         send_data = { 'error': 'I do not allow connections!!' }

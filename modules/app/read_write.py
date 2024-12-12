@@ -227,3 +227,21 @@ class ReadWrite:
         file_path = self.textDir.joinpath(self.settings.meta_file)
         self.writeFile(file_path, json.dumps(contents))
 
+    def hasLogFile(self) -> bool:
+        """Check whether the log file exists."""
+        file_path = self.textDir.joinpath(self.settings.log_file)
+        return file_path.exists() and file_path.is_file and file_path.stat().st_size > 0
+
+    def getLogFile(self) -> list:
+        """Get the contents of the log file."""
+        file_path = self.textDir.joinpath(self.settings.log_file)
+
+        if self.hasLogFile():
+            return json.loads(file_path.read_text())
+        else:
+            return []
+
+    def writeLogFile( self , contents ):
+        file_path = self.textDir.joinpath(self.settings.log_file)
+        self.writeFile(file_path, json.dumps(contents))
+

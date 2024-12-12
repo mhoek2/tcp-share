@@ -9,6 +9,7 @@ from modules.app.gui import Gui
 from modules.app.read_write import ReadWrite
 from modules.translate import Translate
 from modules.qrcode import QRCode
+from modules.logging import Logging
 
 # app modules
 from modules.crypt import Crypt
@@ -31,6 +32,7 @@ class Application( Tk ):
         # empty placeholder modules
         self.crypt : Crypt = Crypt( self )
         self.to_pdf : ToPDF = ToPDF( self )
+        self.log : Logging = Logging( self )
 
         if not pytest:
             # background worker to check incoming TCP connections

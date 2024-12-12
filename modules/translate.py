@@ -77,6 +77,9 @@ class Translate:
 
             if valid:
                 self.context.read_write.writeTextFile( file['filename'], text )
+
+                current_language : self.Language_t = self.getCurrentLanguage()
+                self.context.log.log_file( file['filename'], f"Translated: {current_language['short']} to {lang['short']}" )
             else:
                 print( text )
 
