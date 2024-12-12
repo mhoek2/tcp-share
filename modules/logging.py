@@ -28,7 +28,7 @@ class Logging:
         self.context.read_write.writeLogFile( log )
 
     def log_file( self, filename : str, comment : str ):
-        data : self.LogData_t = { "ip:": self.settings.server_ip, 
+        data : self.LogData_t = { "ip": self.settings.server_ip, 
                                   "file": filename, 
                                   "comment": comment, 
                                   "datetime": str(datetime.datetime.now())

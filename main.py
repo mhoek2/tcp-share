@@ -15,6 +15,7 @@ from modules.logging import Logging
 from modules.crypt import Crypt
 from modules.gui.share_files import GUI_ShareFiles
 from modules.gui.view_files import GUI_ViewFiles
+from modules.gui.view_logs import GUI_ViewLogs
 from modules.tcp import TCP
 from modules.to_pdf import ToPDF
 
