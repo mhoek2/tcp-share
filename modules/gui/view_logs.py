@@ -47,10 +47,10 @@ class GUI_ViewLogs( GuiModule ):
             # Create the columns
             file_label = Label(table, text="File", width=15)
             file_label.grid(row=0, column=0)
-            date_label = Label(table, text="Date", width=15)
-            date_label.grid(row=0, column=1)
-            content_label = Label(table, text="Content", width=30)
-            content_label.grid(row=0, column=2)
+            comment_label = Label(table, text="Comment", width=15)
+            comment_label.grid(row=0, column=1)
+            date_label = Label(table, text="Date", width=30)
+            date_label.grid(row=0, column=2)
 
             for i, entry_id in enumerate(device['entries']):
                 entry = log[entry_id]
@@ -59,9 +59,9 @@ class GUI_ViewLogs( GuiModule ):
                 file.grid(row=i+1, column=0)
                 file.insert(0, f"{entry['file']}")
 
-                content = Entry(table, width=15)
-                content.grid(row=i+1, column=1)
-                content.insert(0, entry['comment'])
+                comment = Entry(table, width=15)
+                comment.grid(row=i+1, column=1)
+                comment.insert(0, entry['comment'])
 
                 date = Entry(table, width=30)
                 date.grid(row=i+1, column=2)
