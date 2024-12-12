@@ -69,6 +69,7 @@ class Crypt:
             self.context.read_write.writeTextFile(
                 new_filename, encrypted_contents.decode()
             )
+            self.context.log.log_file( new_filename, f"Encrypted: {file['filename']} to {new_filename}" )
 
     def encrypt_text(self, text: bytes, i: int) -> bytes:
         """
@@ -92,6 +93,8 @@ class Crypt:
             self.context.read_write.writeTextFile(
                 new_filename, decrypted_contents.decode()
             )
+            self.context.log.log_file( new_filename, f"Decrypted: {file['filename']} to {new_filename}" )
+
         self.context.read_write.removePasswordFile()
 
         self.context.read_write.removePasswordsFile()

@@ -16,6 +16,7 @@ class Settings:
         self.qr_subdir = "qr"
         self.password_file = "passwords.secret"
         self.meta_file = "files.meta"
+        self.log_file = "files.log"
 
         # placeholder to illustrate good practice of keeping things dynamic
         self.file_prefix = "file_"

@@ -47,6 +47,7 @@ class GUI_CreateFiles(GuiModule):
             file_name = f"{widget['header']['text']}.txt"
             file_content = widget["textbox"].get(1.0, "end-1c")
             self.context.read_write.writeTextFile(file_name, file_content)
+            self.context.log.log_file( file_name, f"Created" )
 
         self.writeMeta()
 

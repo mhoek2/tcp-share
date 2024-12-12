@@ -199,6 +199,10 @@ class GUI_ShareFiles( GuiModule ):
         self.context.read_write.removePdfFiles()
         self.context.read_write.removeQRFiles()
 
+    def openLogs( self ):
+        reload_frame : bool = True # redundant bool ..
+        self.gui.show_frame( self.gui.FRAME_VIEW_LOGS, reload_frame )
+
     def onStart( self ):
         lan_info = Label( self, text=f"LAN Address: {self.settings.server_ip}:{self.settings.tcp_port}" )
         lan_info.configure(font=("Helvetica", 14, "bold"))
@@ -242,6 +246,11 @@ class GUI_ShareFiles( GuiModule ):
 
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()
+
+        logs = Button( self, text = "Logs", 
+               command = lambda : self.openLogs() )
+        logs.place( x = self.settings.appplication_width - 180, 
+                      y = self.settings.appplication_height - 40 )
 
         button = Button( self, text = "Opnieuw Beginnen", 
                command = lambda : self._debugClearFiles() )

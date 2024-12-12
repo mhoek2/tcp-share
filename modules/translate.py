@@ -23,14 +23,14 @@ class Translate:
         self.LANG_DE : int = 1
         self.LANG_FR : int = 2
 
-        self.languages: List[ self.Language_t ] = [
+        self.languages: List[ Translate.Language_t ] = [
             { 'short': 'NL', 'name': 'Nederlands', 'api_id': 'nl', 'color':'green' },
             { 'short': 'DE', 'name': 'Duits', 'api_id': 'de', 'color':'yellow' },
             { 'short': 'FR', 'name': 'Frans', 'api_id': 'fr', 'color':'red' },
         ]
         for i, l in enumerate(self.languages):  l['lang_id'] = i
 
-        self.default_language : self.Language_t = self.languages [ self.LANG_NL ]
+        self.default_language : Translate.Language_t = self.languages [ self.LANG_NL ]
 
     def getDefaultLanguage( self ) -> Language_t:
         return self.default_language;
@@ -77,6 +77,9 @@ class Translate:
 
             if valid:
                 self.context.read_write.writeTextFile( file['filename'], text )
+
+                current_language : Translate.Language_t = self.getCurrentLanguage()
+                self.context.log.log_file( file['filename'], f"Translated: {current_language['short']} to {lang['short']}" )
             else:
                 print( text )
 
@@ -103,7 +106,7 @@ class Translate:
 
         Label(modal, text=f"Tekstbestand vertalen").pack( pady=10 )
         
-        current_language : self.Language_t = self.getCurrentLanguage()
+        current_language : Translate.Language_t = self.getCurrentLanguage()
 
         for lang in self.languages:
             # disable current language button
@@ -118,7 +121,7 @@ class Translate:
         text: str = file['contents'].decode('utf-8', errors='ignore');
         valid : bool = False
 
-        in_lang : self.Language_t = self.getCurrentLanguage()
+        in_lang : Translate.Language_t = self.getCurrentLanguage()
         print( f"translate from {in_lang} to {out_lang}:{out_lang['name']}")
 
         if in_lang != out_lang:

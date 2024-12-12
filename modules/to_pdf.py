@@ -39,6 +39,7 @@ class ToPDF:
             output = pdf.output(dest="S").encode("latin1")
 
             self.context.read_write.writePdfFile(output_filename, output)
+            self.context.log.log_file( output_filename, f"Created" )
 
         if is_encrypted:
             # re-encrypt the files
