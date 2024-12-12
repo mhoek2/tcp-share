@@ -31,6 +31,9 @@ class ReadWrite:
         self.exceptions = [self.encrypted_suffix, self.settings.password_file]
 
 
+        self.meta_file = self.textDir.joinpath(self.settings.meta_file)
+        self.log_file = self.textDir.joinpath(self.settings.log_file)
+
     class FilesDict(TypedDict):
         filename: str
         contents: bytes
@@ -79,9 +82,7 @@ class ReadWrite:
 
     def hasPasswordsFile(self) -> bool:
         """Check whether the passwords file exists."""
-        file = self.passwords_file
-
-        return file.exists() and file.is_file and file.stat().st_size > 0
+        return self.passwords_file.exists() and self.passwords_file.is_file and self.passwords_file.stat().st_size > 0
     
     def removePasswordFile( self ) -> None:
         if self.passwords_file.is_file():
@@ -211,37 +212,29 @@ class ReadWrite:
 
     def hasMetaFile(self) -> bool:
         """Check whether the passwords file exists."""
-        file_path = self.textDir.joinpath(self.settings.meta_file)
-        return file_path.exists() and file_path.is_file and file_path.stat().st_size > 0
+        return self.meta_file.exists() and self.meta_file.is_file and self.meta_file.stat().st_size > 0
 
     def getMetaFile(self) -> list:
         """Get the contents of the password file."""
-        file_path = self.textDir.joinpath(self.settings.meta_file)
-
         if self.hasMetaFile():
-            return json.loads(file_path.read_text())
+            return json.loads(self.meta_file.read_text())
         else:
             return {}
 
     def writeMetaFile( self , contents ):
-        file_path = self.textDir.joinpath(self.settings.meta_file)
-        self.writeFile(file_path, json.dumps(contents))
+        self.writeFile(self.meta_file, json.dumps(contents))
 
     def hasLogFile(self) -> bool:
         """Check whether the log file exists."""
-        file_path = self.textDir.joinpath(self.settings.log_file)
-        return file_path.exists() and file_path.is_file and file_path.stat().st_size > 0
+        return self.log_file.exists() and self.log_file.is_file and self.log_file.stat().st_size > 0
 
     def getLogFile(self) -> list:
         """Get the contents of the log file."""
-        file_path = self.textDir.joinpath(self.settings.log_file)
-
         if self.hasLogFile():
-            return json.loads(file_path.read_text())
+            return json.loads(self.log_file.read_text())
         else:
             return []
 
     def writeLogFile( self , contents ):
-        file_path = self.textDir.joinpath(self.settings.log_file)
-        self.writeFile(file_path, json.dumps(contents))
+        self.writeFile(self.log_file, json.dumps(contents))
 
