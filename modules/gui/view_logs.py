@@ -16,7 +16,7 @@ class GUI_ViewLogs( GuiModule ):
 
         log = self.context.read_write.getLogFile()
 
-        get_device = lambda ip: next((device for device in self.settings.LAN_devices if device['ip'] == ip), None)
+        get_device = lambda ip: next((device for device in self.settings.LAN_devices if device['ip'] == ip), { 'hostname':'n/a', 'ip':ip })
 
         # sort by device
         entries_sorted = []
