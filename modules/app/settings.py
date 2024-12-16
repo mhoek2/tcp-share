@@ -27,6 +27,7 @@ class Settings:
 
         # tcp
         self.server_ip = '127.0.0.1'
+        self.server_hostname = 'example'
         self.tcp_port = 43431
         self.allowConnection = 1
         self.bufsize_meta = 1024    # bytes for simple commands and handshakes

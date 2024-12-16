@@ -1,18 +1,21 @@
 import json
 from pathlib import Path
 
-from typing import TypedDict
+from typing import TYPE_CHECKING, Dict, TypedDict
 
 import os
 import json 
 
 from modules.app.settings import Settings
 
+if TYPE_CHECKING:
+    from main import Application
 
 class ReadWrite:
-    def __init__(self) -> None:
+    def __init__(self, context) -> None:
         """This class handles reading from and writing to files."""
-        self.settings: Settings = Settings()
+        self.context : "Application" = context;
+        self.settings : Settings = context.settings
 
         self.numShareableFiles: int = 0
         self.prevShareableFiles: int = 0
@@ -248,6 +251,8 @@ class ReadWrite:
 
     def getDevicesFromFile( self ):
         if not self.devices_cfg.exists() or not self.devices_cfg.is_file or self.devices_cfg.stat().st_size == 0:
-            self.writeFile( self.devices_cfg, '[{ "hostname":"example", "ip":"192.168.1.50" }]')
+            device = [{'hostname': self.settings.server_hostname, 'ip': self.settings.server_ip}]
+
+            self.writeFile( self.devices_cfg, json.dumps( device ) )
 
         return json.loads( self.devices_cfg.read_text() )
