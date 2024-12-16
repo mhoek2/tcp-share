@@ -250,5 +250,4 @@ class ReadWrite:
         if not self.devices_cfg.exists() or not self.devices_cfg.is_file or self.devices_cfg.stat().st_size == 0:
             self.writeFile( self.devices_cfg, '[{ "hostname":"example", "ip":"192.168.1.50" }]')
 
-        content = self.devices_cfg.read_text()
-        return json.loads( content )
+        return json.loads( self.devices_cfg.read_text() )
