@@ -36,6 +36,10 @@ class TCP:
             s.close()
 
     # server
+    def respond( self, c, send_data ):
+        c.send( json.dumps( send_data ).encode() )
+        c.close()  
+
     def start_server( self ) -> None:
         """Starts the TCP socker server, use this function as target in a dedicated thread, as it operates in an infinite loop. 
         This ensures the server can handle incoming connections concurrently 
@@ -55,38 +59,57 @@ class TCP:
             received = c.recv( self.settings.bufsize_payload ).decode('utf-8')
             rcv_data = json.loads( received )
 
-            send_data = { }
+            # check if this is a valid request
+            if not 'action' in rcv_data:
+                self.respond( c, { 'error': 'Invalid request' } )
+                continue
 
-            if 'action' in rcv_data:
-                # request to store a file
-                if rcv_data['action'] == "store_file":
-                    if self.settings.allowConnection:
-                        file = rcv_data['file']
-                        print( f"received file: {file}" )
-                        filename = file['filename']
-                        content = file['contents']
+            _action = rcv_data['action']
 
-                        if file['is_bytes']:
-                            print("write bytes")
-                            content_bytes = base64.b64decode( content )
-                            self.context.read_write.writePdfFile( filename, content_bytes )
-                        else:
-                            self.context.read_write.writeTextFile( filename, content )
+            # only allow 'get_allow_receive' request without allowConnection check
+            if _action == "get_allow_receive":
+                print( f"request get_allow_receive" )
+                self.respond( c, { 'value': self.settings.allowConnection } )
+                continue
 
-                        send_data = { 'success': 'File received successfully!' }
+            elif not self.settings.allowConnection:
+                self.respond( c, { 'error': 'I do not allow connections!!' } )
+                continue
 
-                        self.context.log.log_file( filename, f"Received from: {addr[0]}" )
-                    else:
-                        print("Connections is refused!")
-                        send_data = { 'error': 'I do not allow connections!!' }
+            # clear local files request, assuming incoming files.
+            if _action == "clear_all_files":
+                state = True
 
-                # request to return a value
-                if rcv_data['action'] == "get_allow_receive":
-                    print( f"request get_allow_receive" )
-                    send_data = { 'value': self.settings.allowConnection }
-                    
-            c.send( json.dumps( send_data ).encode() )
-            c.close()   
+                # skip if request is local.
+                if addr[0] == self.settings.server_ip:
+                    state = False
+
+                if state:
+                    self.context.read_write.removeTransferFiles()
+                    self.context.read_write.removePdfFiles()
+                    self.context.read_write.removeQRFiles()
+
+                self.respond( c, { 'value': state } )
+                continue
+
+            # request to store a file
+            elif _action == "store_file":
+                file = rcv_data['file']
+                print( f"received file: {file}" )
+                filename = file['filename']
+                content = file['contents']
+
+                if file['is_bytes']:
+                    print("write bytes")
+                    content_bytes = base64.b64decode( content )
+                    self.context.read_write.writePdfFile( filename, content_bytes )
+                else:
+                    self.context.read_write.writeTextFile( filename, content )
+
+                self.context.log.log_file( filename, f"Received from: {addr[0]}" )
+                self.respond( c, { 'success': 'File received successfully!' } )
+                continue
+
         return
 
     # client
@@ -220,14 +243,22 @@ class TCP:
            -------
            bool : State of the server allows connections checkbox, or False if request timedout
         """
-        state = self.get_boolean( server, "get_allow_receive" )
+        return self.get_boolean( server, "get_allow_receive" )
 
-        if state:
-            print("Allows receiving")
-        else:
-            print("Refuse receiving")
+    def server_clear_files( self, server: Server_t ):
+        """Connect to a socket stream and request a boolean state, then close the stream
 
-        return state
+           Parameters
+           ----------
+           server : tuple
+                0: IP address
+                1: TCP port
+
+           Returns
+           -------
+           bool : If the server successfully clear all files
+        """
+        return self.get_boolean( server, "clear_all_files" )
 
     # ping device
     def ping_device(self, host, network_timeout=1):
