@@ -17,6 +17,7 @@ class Settings:
         self.password_file = "passwords.secret"
         self.meta_file = "files.meta"
         self.log_file = "files.log"
+        self.devices_file = f"{self.rootdir}\\devices.cfg"
 
         # placeholder to illustrate good practice of keeping things dynamic
         self.file_prefix = "file_"
@@ -32,9 +33,5 @@ class Settings:
         self.bufsize_payload = 4096 # bytes for larger transfers content like text or bytes
 
         # LAN devices
-        self.LAN_devices = [
-            { 'hostname':'RGD-ITA-001', 'ip':'10.0.82.23', 'gui': {} },
-            { 'hostname':'RGD-ITA-005', 'ip':'10.0.1.63', 'gui': {} },
-            { 'hostname':'RGD-ITA-006', 'ip':'10.0.151.181', 'gui': {} },
-            { 'hostname':'RGD-ITA-007', 'ip':'10.0.1.57', 'gui': {} }
-        ]
+        # Loaded from devices.cfg
+        self.LAN_devices = []

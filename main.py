@@ -26,6 +26,8 @@ class Application( Tk ):
         self.tcp : TCP = TCP( self ) 
         self.read_write : ReadWrite = ReadWrite()
 
+        self.tcp.load_lan_devices();
+
         self.translate : Translate = Translate( self )
         self.qrcode : QRCode = QRCode( self )
         self.tk_root : Gui = Gui( self )

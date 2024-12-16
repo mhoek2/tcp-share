@@ -91,6 +91,7 @@ class GUI_ShareFiles( GuiModule ):
             self.updateDevice( device )
 
     def drawDevice( self, device ):   
+        device['gui'] = {}
         device['gui']['frame'] = Frame( self, bg="white", padx=0, pady=0 )
         device['gui']['frame'].place( x = 20, 
                             y = self.current_position.y,

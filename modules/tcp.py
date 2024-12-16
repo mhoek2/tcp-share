@@ -1,5 +1,5 @@
 # app core modules
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Dict, TypedDict
 from modules.app.settings import Settings
 
 import socket
@@ -16,6 +16,7 @@ class TCP:
     class Server_t(TypedDict):
         ip: str
         port: int
+        gui: Dict
 
     def __init__( self, context ) -> None:
         self.context : "Application" = context;
@@ -34,6 +35,14 @@ class TCP:
             self.settings.server_ip = s.getsockname()[0]  # Get the local IP address
         finally:
             s.close()
+
+    def load_lan_devices( self ) -> None:
+        """Get LAN devices from config file"""
+        devices : list[TCP.Server_t] = self.context.read_write.getDevicesFromFile()
+        
+        self.settings.LAN_devices = devices.copy()
+        #for device in devices:
+        #    self.settings.LAN_devices.append( device )
 
     # server
     def respond( self, c, send_data ):
