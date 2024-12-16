@@ -90,14 +90,15 @@ class GUI_ShareFiles( GuiModule ):
         for device in self.settings.LAN_devices:
             self.updateDevice( device )
 
-    def drawDevice( self, device ):   
+    def drawDevice( self, device, content_frame ):   
         device['gui'] = {}
-        device['gui']['frame'] = Frame( self, bg="white", padx=0, pady=0 )
-        device['gui']['frame'].place( x = 20, 
-                            y = self.current_position.y,
-                            width = (self.settings.appplication_width - 40 ), 
-                            height = 45 ) 
+        device['gui']['frame'] = Frame( content_frame, bg="white", padx=10, pady=5 )
+        device['gui']['frame'].pack( side=TOP, fill='both' ) 
         frame = device['gui']['frame']
+
+        # setting size on 'frame' doesnt work?
+        pseudo_element = Frame( frame, width = (self.settings.appplication_width - 40 ), height = 45)
+        pseudo_element.pack( side=LEFT, fill='x' )
 
         device['gui']['status_indicator'] = Frame( frame, bg="#d1d1d1", padx=0, pady=0 )
         device['gui']['status_indicator'].place( x=-0, y=-0, width=3, heigh =45 ) 
@@ -115,9 +116,37 @@ class GUI_ShareFiles( GuiModule ):
 
         self.current_position.y += 55
 
+    def on_frame_configure(self, event):
+        # Update the scrollregion of the canvas whenever the content frame's size changes
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
     def drawDevices( self ):
+        # frame
+        frame = Frame( self )
+        frame.place(  y = self.current_position.y,
+                      width=self.settings.appplication_width, 
+                      height=self.settings.appplication_height - 225 )
+
+        # canvas
+        self.canvas = Canvas( frame, bg='white' )
+        self.canvas.pack( side=LEFT, fill='both', expand=True )
+
+        # scrollbar
+        y_scrollbar = Scrollbar( frame, orient=VERTICAL, command=self.canvas.yview )
+        y_scrollbar.pack( side=RIGHT, fill=Y )
+        self.canvas.configure(yscrollcommand=y_scrollbar.set)
+
+        # canvas, again
+        content_frame = Frame( self.canvas )
+
         for device in self.settings.LAN_devices:
-            self.drawDevice( device )
+            self.drawDevice( device, content_frame )
+
+        # update region of canvas
+        self.canvas.create_window((0, 0), window=content_frame, anchor='nw')
+        content_frame.update_idletasks()
+        self.canvas.config( scrollregion=self.canvas.bbox( "all" ) )
+        content_frame.bind( "<Configure>", self.on_frame_configure )
 
     def allowConnectionCheckboxCallback( self ):
         self.settings.allowConnection = self.allowCon.get()
@@ -242,12 +271,14 @@ class GUI_ShareFiles( GuiModule ):
         # force LAN device status refresh
         refresh = Button( self, text = "Lijst vernieuwen", 
                command = lambda : self.context.bg_worker_force_gui_update() )
-        refresh.place( x = 20, y = self.current_position.y )
+        refresh.place( x = 10, 
+                      y = self.settings.appplication_height - 40 )
 
         # debug button to create QR codes
-        debug_create_qr = Button( self, text = "Create QR", 
+        create_qr = Button( self, text = "Create QR", 
                command = lambda : self.context.qrcode.create_qr_codes() )
-        debug_create_qr.place( x = 120, y = self.current_position.y )
+        create_qr.place( x = 120, 
+                      y = self.settings.appplication_height - 40 )
 
         # force a gui pass in bg_worker to ping LAN devices
         self.context.bg_worker_force_gui_update()
