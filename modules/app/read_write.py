@@ -118,10 +118,25 @@ class ReadWrite:
     def getTransferFiles( self ) -> list[FilesDict]:
         files = self.getTextFilesByAuth()
 
-        # get additional files ( meta, and passwords )
+        # get additional files ( log, meta, and passwords )
         for item in self.getAllTextFiles():
-            if not item["filename"].endswith(".txt"):
-                files.append(item)
+            if item["filename"].endswith(".txt"):
+                continue
+
+            # make sure .log file is first item.
+            if item["filename"].endswith(".log"):
+                files.insert( 0, item )
+            else: 
+                files.append( item )
+            # or:
+            #index : bool = 0 if item["filename"].endswith(".log") else -1
+            #files.insert( index, item )
+
+        # or:
+        # make sure .log file is sent first.
+        # need to know the index, to do another loop to fetch it adds 
+        # unnecessary overhead
+        #files.insert(0, files.pop( log_idx ) )
 
         return files
 
