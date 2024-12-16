@@ -24,7 +24,9 @@ class Application( Tk ):
     def __init__( self, pytest=False ) -> None:
         self.settings : Settings = Settings()
         self.tcp : TCP = TCP( self ) 
-        self.read_write : ReadWrite = ReadWrite()
+        self.read_write : ReadWrite = ReadWrite( self )
+
+        self.tcp.load_lan_devices();
 
         self.translate : Translate = Translate( self )
         self.qrcode : QRCode = QRCode( self )

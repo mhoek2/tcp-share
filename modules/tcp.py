@@ -1,5 +1,5 @@
 # app core modules
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Dict, TypedDict
 from modules.app.settings import Settings
 
 import socket
@@ -22,9 +22,9 @@ class TCP:
         self.settings : Settings = context.settings
 
         # Get the LAN IP address of the device
-        self.set_local_ip()
+        self.set_local_device()
 
-    def set_local_ip( self ):
+    def set_local_device( self ):
         """Try to get the LAN IP address of the host device"""
         try:
             # Create a temporary socket
@@ -32,8 +32,17 @@ class TCP:
             # Connect to an external address (this won't actually send packets)
             s.connect(('8.8.8.8', 80))  # Using Google DNS as an external address
             self.settings.server_ip = s.getsockname()[0]  # Get the local IP address
+            self.settings.server_hostname = socket.gethostname()  # Get the local hostname
         finally:
             s.close()
+
+    def load_lan_devices( self ) -> None:
+        """Get LAN devices from config file"""
+        devices = self.context.read_write.getDevicesFromFile()
+        
+        self.settings.LAN_devices = devices.copy()
+        #for device in devices:
+        #    self.settings.LAN_devices.append( device )
 
     # server
     def respond( self, c, send_data ):

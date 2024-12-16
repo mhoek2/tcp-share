@@ -19,6 +19,7 @@ class GUI_ViewFiles( GuiModule ):
 
         # QR button
         qr_image = PhotoImage( file=self.settings.rootdir.joinpath( "assets\\qr_button.png" ) )
+        file['gui'] = {}
         file['gui']['qr'] = Button( header_frame, image=qr_image, state=NORMAL,
                 command = lambda param=file['filename']: self.context.qrcode.openQrCodeModal(param) )
         file['gui']['qr'].pack( side=RIGHT, )
@@ -93,7 +94,6 @@ class GUI_ViewFiles( GuiModule ):
         files = self.context.read_write.getTextFilesByAuth()
 
         for file in files:
-            file['gui'] = {}
             self.drawFile( file, content_frame )
 
         # update region of canvas
