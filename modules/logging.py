@@ -20,6 +20,11 @@ class Logging:
     def __init__( self, context ) -> None:
         self.context : "Application" = context
         self.settings : Settings = context.settings
+    
+    @staticmethod
+    def get_date_time() -> str:
+        """Get formatted date time"""
+        return  datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
 
     def log( self, data : LogData_t ):
         """Write to log file"""
@@ -31,6 +36,6 @@ class Logging:
         data : Logging.LogData_t = { "ip": self.settings.server_ip, 
                                   "file": filename, 
                                   "comment": comment, 
-                                  "datetime": str(datetime.datetime.now())
+                                  "datetime": self.get_date_time()
                                 }
         self.log( data )

@@ -111,9 +111,14 @@ class GUI_ViewLogs( GuiModule ):
         content_frame.bind( "<Configure>", self.on_frame_configure )
 
         # footer buttons
+        to_pdf = Button( self, text = "Create PDF", 
+               command = lambda : self.context.to_pdf.log_to_pdf() )
+        to_pdf.place( x = self.settings.appplication_width - 100, 
+                      y = self.settings.appplication_height - 40 )
+
         refresh = Button( self, text = "Refresh", 
                command = lambda : self.refreshPage() )
-        refresh.place( x = self.settings.appplication_width - 270, 
+        refresh.place( x = 80, 
                       y = self.settings.appplication_height - 40 )
 
         back = Button( self, text = "Terug", 
